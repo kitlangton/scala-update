@@ -136,7 +136,7 @@ object CliApp extends TerminalApp[Nothing, CliState, Chunk[(DependencyWithLocati
           }: _*
         ),
         View.text(dep.dependencies.head.version.value.padTo(longestVersionLength, ' ')).cyan.dim,
-        View.text("⭢").cyan,
+        View.text("→").cyan.dim,
         View.horizontal((versions :+ versionMode): _*)
       )
     }
