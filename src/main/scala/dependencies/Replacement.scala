@@ -22,7 +22,7 @@ object Replacement {
           builder.toString()
       }
 
-    loop(replacements.sortBy(_.start), 0)
+    loop(replacements.sortBy(_.start).distinctBy(_.start), 0)
   }
 
 }
