@@ -9,7 +9,7 @@ val coursierVersion = "2.1.0-M6-28-gbad85693f"
 
 lazy val root = (project in file("."))
   .settings(
-    name := "sbt-interactive-update",
+    name := "scala-interactive-update",
     libraryDependencies ++= Seq(
       "dev.zio"              %% "zio"          % zioVersion,
       "dev.zio"              %% "zio-macros"   % zioVersion,
