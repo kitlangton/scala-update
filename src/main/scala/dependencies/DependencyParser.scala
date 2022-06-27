@@ -68,7 +68,7 @@ object DependencyParser {
               _,
               List(ident)
             ) =>
-          throw new Error(s"Could not find version for $group %% $artifact % $ident")
+//          throw new Error(s"Could not find version for $group %% $artifact % $ident")
       }
     }
     dependencies.toList
