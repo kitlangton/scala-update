@@ -11,18 +11,23 @@ final case class FilesLive() extends Files {
   override def allScalaFiles(root: String): IO[IOException, Chunk[SourceFile]] = {
     val rootPath = Path(root)
     for {
-      files <- FileUtils
-                 .allScalaFiles(rootPath / "project")
-                 .concat(ZStream.succeed(rootPath / "build.sbt"))
-                 .concat(ZStream.succeed(rootPath / "project" / "plugins.sbt"))
-                 .mapZIO { path =>
-                   ZIO
-                     .readFile(path.toString)
-                     .map { content =>
-                       SourceFile(path, content)
-                     }
-                 }
-                 .runCollect
+      files <-
+        FileUtils
+          .allScalaFiles(rootPath / "project")
+          .concat(ZStream.succeed(rootPath / "build.sbt"))
+          .concat(
+            ZStream
+              .succeed(rootPath / "project" / "plugins.sbt")
+              .filterZIO(path => zio.nio.file.Files.exists(path))
+          )
+          .mapZIO { path =>
+            ZIO
+              .readFile(path.toString)
+              .map { content =>
+                SourceFile(path, content)
+              }
+          }
+          .runCollect
     } yield files
   }
 
