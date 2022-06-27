@@ -1,4 +1,4 @@
-# sbt-interactive-update
+# scala-interactive-update
 Update your sbt dependencies interactively.
 
 ## Installation
@@ -7,7 +7,7 @@ Update your sbt dependencies interactively.
 
 ```shell
 sbt 'show graalvm-native-image:packageBin'
-# [info] ~/code/sbt-interactive-update/target/graalvm-native-image/sbt-interactive-update
+# [info] ~/code/sbt-interactive-update/target/graalvm-native-image/scala-interactive-update
 ```
 
 2. Move the generated binary onto your `PATH`.
@@ -17,7 +17,7 @@ sbt 'show graalvm-native-image:packageBin'
 Run the binary from within an sbt project folder.
 
 ```shell
-sbt-interactive-update
+scala-interactive-update
 ```
 
 <img width="832" alt="CleanShot 2022-06-27 at 09 15 23@2x" src="https://user-images.githubusercontent.com/7587245/175950420-9e645dc9-f140-43f2-ad60-1c88198fa8dc.png">
