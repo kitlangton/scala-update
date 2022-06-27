@@ -25,18 +25,22 @@ object UpdateOptions {
     val allNewerVersions =
       versions.filter(_.isNewerThan(version))
     val majorVersion =
-      allNewerVersions.filter(v => v.major >= major && v.preRelease.isEmpty).lastOption
+      allNewerVersions
+        .filter(v => ((version.preRelease.isDefined && v.major == major) || v.major > major) && v.preRelease.isEmpty)
+        .lastOption
     val minorVersion =
       allNewerVersions
-        .filter(v => v.major == major && v.minor >= minor && v.preRelease.isEmpty)
+        .filter(v => v.major == major && v.minor > minor && v.preRelease.isEmpty)
         .lastOption
         .filterNot(majorVersion.contains)
     val patchVersion = allNewerVersions
-      .filter(v => v.major == major && v.minor == minor && v.patch >= patch && v.preRelease.isEmpty)
+      .filter(v => v.major == major && v.minor == minor && v.patch > patch && v.preRelease.isEmpty)
       .lastOption
       .filterNot(v => majorVersion.contains(v) || minorVersion.contains(v))
     val preReleaseVersions =
-      allNewerVersions.filter(_.preRelease.isDefined).lastOption.filterNot(v => majorVersion.exists(_.isNewerThan(v)))
+      allNewerVersions
+        .filter(_.preRelease.isDefined)
+        .lastOption
 
     UpdateOptions(majorVersion, minorVersion, patchVersion, preReleaseVersions)
   }

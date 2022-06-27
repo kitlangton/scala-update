@@ -34,6 +34,26 @@ object UpgradeOptionsSpec extends ZIOSpecDefault {
 
         assertTrue(result == expected)
       },
+      test("only minor") {
+        val result = UpdateOptions
+          .getOptions(
+            Version("1.0.0"),
+            List(
+              Version("1.1.0"),
+              Version("1.1.1") // newest minor version
+            )
+          )
+
+        val expected =
+          UpdateOptions(
+            None,
+            Some(Version("1.1.1")),
+            None,
+            None
+          )
+
+        assertTrue(result == expected)
+      },
       test("rc version") {
         val result = UpdateOptions
           .getOptions(
