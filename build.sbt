@@ -11,16 +11,24 @@ lazy val root = (project in file("."))
   .settings(
     name := "sbt-interactive-update",
     libraryDependencies ++= Seq(
-      "dev.zio"         %% "zio"          % zioVersion,
-      "dev.zio"         %% "zio-macros"   % zioVersion,
-      "dev.zio"         %% "zio-nio"      % zioNioVersion,
-      "dev.zio"         %% "zio-streams"  % zioVersion,
-      "dev.zio"         %% "zio-test"     % zioVersion % Test,
-      "dev.zio"         %% "zio-test-sbt" % zioVersion % Test,
-      "io.get-coursier" %% "coursier"     % coursierVersion,
-      "org.scalameta"   %% "scalameta"    % "4.5.9"
+      "dev.zio"               %% "zio"          % zioVersion,
+      "dev.zio"               %% "zio-macros"   % zioVersion,
+      "dev.zio"               %% "zio-nio"      % zioNioVersion,
+      "dev.zio"               %% "zio-streams"  % zioVersion,
+      "com.lihaoyi"           %% "fansi"        % "0.2.13",
+      "com.github.ghostdogpr" %% "caliban"      % "1.4.0",
+      "dev.zio"               %% "zio-test"     % zioVersion % Test,
+      "dev.zio"               %% "zio-test-sbt" % zioVersion % Test,
+      "io.get-coursier"       %% "coursier"     % coursierVersion,
+      "org.scalameta"         %% "scalameta"    % "4.5.9",
+      "io.github.kitlangton"  %% "zio-tui"      % "0.0.0+1-46a304ff+20220626-2258-SNAPSHOT"
     ),
-    testFrameworks += new TestFramework("zio.test.sbt.ZTestFramework")
+//    Compile / mainClass := Some("dependencies.Main"),
+    testFrameworks += new TestFramework("zio.test.sbt.ZTestFramework"),
+    graalVMNativeImageOptions ++= Seq(
+      "--no-fallback"
+    )
   )
+  .enablePlugins(GraalVMNativeImagePlugin)
 
 Global / onChangedBuildSource := ReloadOnSourceChanges

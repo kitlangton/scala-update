@@ -7,7 +7,7 @@ object UpgradeOptionsSpec extends ZIOSpecDefault {
   def spec =
     suite("UpgradeOptionsSpec")(
       test("simple version") {
-        val result = UpgradeOptions
+        val result = UpdateOptions
           .getOptions(
             Version("1.0.0"),
             List(
@@ -25,7 +25,7 @@ object UpgradeOptionsSpec extends ZIOSpecDefault {
           )
 
         val expected =
-          UpgradeOptions(
+          UpdateOptions(
             Some(Version("2.1.2")),
             Some(Version("1.1.1")),
             Some(Version("1.0.2")),
@@ -35,7 +35,7 @@ object UpgradeOptionsSpec extends ZIOSpecDefault {
         assertTrue(result == expected)
       },
       test("rc version") {
-        val result = UpgradeOptions
+        val result = UpdateOptions
           .getOptions(
             Version("1.0.0-RC1"),
             List(
@@ -45,7 +45,7 @@ object UpgradeOptionsSpec extends ZIOSpecDefault {
           )
 
         val expected =
-          UpgradeOptions(
+          UpdateOptions(
             Some(Version("1.0.0")),
             None,
             None,

@@ -1,6 +1,6 @@
 package dependencies
 
-final case class UpgradeOptions(
+final case class UpdateOptions(
   major: Option[Version],
   minor: Option[Version],
   patch: Option[Version],
@@ -9,13 +9,15 @@ final case class UpgradeOptions(
   def newestVersion: Option[Version] =
     major.orElse(minor).orElse(patch).orElse(preRelease)
 
+  def allVersions: List[Version] = major.toList ++ minor.toList ++ patch.toList ++ preRelease.toList
+
   def isEmpty: Boolean    = major.isEmpty && minor.isEmpty && patch.isEmpty && preRelease.isEmpty
   def isNonEmpty: Boolean = !isEmpty
 }
 
-object UpgradeOptions {
+object UpdateOptions {
 
-  def getOptions(version: Version, versions: List[Version]): UpgradeOptions = {
+  def getOptions(version: Version, versions: List[Version]): UpdateOptions = {
     val major = version.major
     val minor = version.minor
     val patch = version.patch
@@ -34,9 +36,9 @@ object UpgradeOptions {
       .lastOption
       .filterNot(v => majorVersion.contains(v) || minorVersion.contains(v))
     val preReleaseVersions =
-      allNewerVersions.filter(_.preRelease.isDefined).lastOption
+      allNewerVersions.filter(_.preRelease.isDefined).lastOption.filterNot(v => majorVersion.exists(_.isNewerThan(v)))
 
-    UpgradeOptions(majorVersion, minorVersion, patchVersion, preReleaseVersions)
+    UpdateOptions(majorVersion, minorVersion, patchVersion, preReleaseVersions)
   }
 
 }

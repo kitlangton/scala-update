@@ -14,13 +14,18 @@ case class DependencyUpdater(versions: Versions, files: Files) {
       newestVersions = updates.flatMap { case (dep, options) =>
                          options.newestVersion.map(dep -> _)
                        }
-      collected = groupUpdatesByFile(newestVersions)
-      _ <- ZIO.foreachDiscard(collected) { case (path, updates) =>
-             updateFile(path, updates)
-           }
+      _ <- runUpdates(Chunk.from(newestVersions))
     } yield ()
 
-  def allUpdateOptions: IO[Throwable, List[(DependencyWithLocation, UpgradeOptions)]] = for {
+  def runUpdates(updates: Chunk[(DependencyWithLocation, Version)]): IO[IOException, Unit] = {
+    val collected = groupUpdatesByFile(updates)
+    ZIO.foreachDiscard(collected) { case (path, updates) =>
+      updateFile(path, updates)
+    }
+
+  }
+
+  def allUpdateOptions: IO[Throwable, List[(DependencyWithLocation, UpdateOptions)]] = for {
     pwd         <- System.property("user.dir").someOrFailException
     sourceFiles <- files.allScalaFiles(pwd)
     deps         = DependencyParser.getDependencies(sourceFiles.toList)
@@ -28,30 +33,30 @@ case class DependencyUpdater(versions: Versions, files: Files) {
   } yield updates
 
   private def groupUpdatesByFile(
-    updates: List[(DependencyWithLocation, Version)]
-  ): Map[Path, List[VersionWithLocation]] =
+    updates: Chunk[(DependencyWithLocation, Version)]
+  ): Map[Path, Chunk[VersionWithLocation]] =
     updates.groupMap(_._1.location.path) { case (dep, version) =>
       VersionWithLocation(version, dep.location)
     }
 
-  private def updateFile(path: Path, updates: List[VersionWithLocation]): IO[IOException, Unit] =
+  private def updateFile(path: Path, updates: Chunk[VersionWithLocation]): IO[IOException, Unit] =
     ZIO.scoped {
       for {
         oldContent <- ZIO.readFile(path.toString)
         replacements = updates.map { case VersionWithLocation(version, location) =>
                          Replacement(location.start, location.end, "\"" + version.value + "\"")
                        }
-        newContent = Replacement.replace(oldContent, replacements)
+        newContent = Replacement.replace(oldContent, replacements.toList)
         _         <- ZIO.writeFile(path.toString, newContent)
       } yield ()
     }
 
   private def getUpgradeOptions(
     dependency: DependencyWithLocation
-  ): IO[Throwable, (DependencyWithLocation, UpgradeOptions)] =
+  ): IO[Throwable, (DependencyWithLocation, UpdateOptions)] =
     for {
       allVersions <- versions.getVersions(dependency.dependency.group, dependency.dependency.artifact)
-    } yield dependency -> UpgradeOptions.getOptions(dependency.dependency.version, allVersions)
+    } yield dependency -> UpdateOptions.getOptions(dependency.dependency.version, allVersions)
 }
 
 object DependencyUpdater {

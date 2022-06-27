@@ -3,7 +3,7 @@ package dependencies.versions
 import coursier.cache.FileCache
 import coursier.{Module, ModuleName, Organization, Repositories}
 import dependencies.versions.ZioSyncInstance._
-import dependencies.{Artifact, Group, Version}
+import dependencies.{Artifact, DependencyUpdater, Files, Group, Version}
 import zio._
 
 final case class VersionsLive() extends Versions {
@@ -19,4 +19,12 @@ final case class VersionsLive() extends Versions {
       .map { case (versions, _) =>
         versions.available.map(Version)
       }
+      .orElseSucceed(List.empty)
 }
+
+//object VersionsDemo extends ZIOAppDefault {
+//  val run =
+//    ZIO
+//      .serviceWithZIO[DependencyUpdater](_.allUpdateOptions)
+//      .provide(DependencyUpdater.live, Files.live, Versions.live)
+//}
