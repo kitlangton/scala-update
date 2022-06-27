@@ -1,5 +1,5 @@
 # scala-interactive-update
-Update your Scala dependencies (both libraries and plugins) interactively.
+Update your Scala dependencies (both libraries and plugins) interactively. [Video Demo](https://twitter.com/kitlangton/status/1541417514823028740).
 
 ## Installation
 
@@ -39,3 +39,9 @@ If multiple dependencies share a single version, they will be grouped.
 If a dependency has multiple possible update version—for instance, a new major version and a new minor version—then you can select which version to upgrade to.
 
 <img width="1085" alt="CleanShot 2022-06-27 at 09 20 23@2x" src="https://user-images.githubusercontent.com/7587245/175951467-c2e15bbd-e450-46d6-bff8-5bf8ffc787dd.png">
+
+## FAQ
+
+### How did you make the interactive CLI?
+
+I have another library, [ZIO-TUI](https://github.com/kitlangton/zio-tui), for creating interactive command line interactive programs just like this one.
