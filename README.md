@@ -44,4 +44,4 @@ If a dependency has multiple possible update version—for instance, a new major
 
 ### How did you make the interactive CLI?
 
-I have another library, [ZIO-TUI](https://github.com/kitlangton/zio-tui), for creating interactive command line interactive programs just like this one.
+I have another library, [zio-tui](https://github.com/kitlangton/zio-tui), for creating interactive command line interactive programs just like this one.
