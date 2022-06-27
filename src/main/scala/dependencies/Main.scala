@@ -7,19 +7,41 @@ import view.View
 import zio._
 
 object Main extends ZIOAppDefault {
+
   val run = {
     for {
-      options <- ZIO.serviceWithZIO[DependencyUpdater](_.allUpdateOptions)
-      toUpdate = options
-                   .filter(_._2.isNonEmpty)
-                   .groupBy(_._1.location)
-                   .values
-                   .map { depsWithOpts =>
-                     val opts: UpdateOptions = depsWithOpts.head._2
-                     val deps: NonEmptyChunk[DependencyWithLocation] =
-                       NonEmptyChunk.fromIterableOption(depsWithOpts.map(_._1)).get
-                     DependencyState.from(deps, opts)
-                   }
+      options0 <- ZIO.serviceWithZIO[DependencyUpdater](_.allUpdateOptions)
+      options   = options0.filter(_._2.isNonEmpty)
+      _ <- if (options.nonEmpty)
+             runSelector(options)
+           else
+             ZIO.debug(
+               View
+                 .text("All of your dependencies are up to date! 🎉")
+                 .blue
+                 .padding(1)
+                 .renderNow
+             )
+    } yield ()
+  }.provide(
+    TUI.live(false),
+    DependencyUpdater.live,
+    Versions.live,
+    Files.live
+  )
+
+  def runSelector(
+    options: List[(DependencyWithLocation, UpdateOptions)]
+  ): ZIO[DependencyUpdater with TUI, Throwable, Unit] = {
+    val toUpdate =
+      options.groupBy(_._1.location).values.map { depsWithOpts =>
+        val opts: UpdateOptions = depsWithOpts.head._2
+        val deps: NonEmptyChunk[DependencyWithLocation] =
+          NonEmptyChunk.fromIterableOption(depsWithOpts.map(_._1)).get
+        DependencyState.from(deps, opts)
+      }
+
+    for {
       chosen             <- CliApp.run(CliState(Chunk.from(toUpdate), 0, Set.empty))
       _                  <- ZIO.serviceWithZIO[DependencyUpdater](_.runUpdates(chosen))
       longestArtifactName = chosen.map(_._1.dependency.artifact.value.length).max
@@ -44,10 +66,5 @@ object Main extends ZIOAppDefault {
                .renderNow
            )
     } yield ()
-  }.provide(
-    TUI.live(false),
-    DependencyUpdater.live,
-    Versions.live,
-    Files.live
-  )
+  }
 }
