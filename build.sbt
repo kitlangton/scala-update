@@ -24,7 +24,8 @@ lazy val root = (project in file("."))
 //    Compile / mainClass := Some("dependencies.cli.Main"),
     testFrameworks += new TestFramework("zio.test.sbt.ZTestFramework"),
     graalVMNativeImageOptions ++= Seq(
-      "--no-fallback"
+      "--no-fallback",
+      "--enable-url-protocols=https
     )
   )
   .enablePlugins(GraalVMNativeImagePlugin)
