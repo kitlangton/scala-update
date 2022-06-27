@@ -42,29 +42,34 @@ object Main extends ZIOAppDefault {
       }
 
     for {
-      chosen             <- CliApp.run(CliState(Chunk.from(toUpdate), 0, Set.empty))
-      _                  <- ZIO.serviceWithZIO[DependencyUpdater](_.runUpdates(chosen))
-      longestArtifactName = chosen.map(_._1.dependency.artifact.value.length).max
-      longestVersion      = chosen.map(_._1.dependency.version.value.length).max
-      _ <- ZIO.debug(
-             View
-               .vertical(
-                 Chunk(
-                   View.text("UPDATED DEPENDENCIES").blue,
-                   View.text("────────────────────").blue.dim
-                 ) ++
-                   chosen.map { case (dep, version) =>
-                     View.horizontal(
-                       View.text(dep.dependency.artifact.value.padTo(longestArtifactName, ' ')).cyan,
-                       View.text(dep.dependency.version.value.padTo(longestVersion, ' ')).cyan.dim,
-                       View.text("→").cyan.dim,
-                       View.text(version.value).green.underlined
-                     )
-                   }: _*
-               )
-               .padding(1)
-               .renderNow
-           )
+      chosen <- CliApp.run(CliState(Chunk.from(toUpdate), 0, Set.empty))
+      _ <- ZIO.when(chosen.nonEmpty) {
+             for {
+               _                  <- ZIO.serviceWithZIO[DependencyUpdater](_.runUpdates(chosen))
+               longestArtifactName = chosen.map(_._1.dependency.artifact.value.length).max
+               longestVersion      = chosen.map(_._1.dependency.version.value.length).max
+               _ <- Console
+                      .printLine(
+                        View
+                          .vertical(
+                            Chunk(
+                              View.text("UPDATED DEPENDENCIES").blue,
+                              View.text("────────────────────").blue.dim
+                            ) ++
+                              chosen.map { case (dep, version) =>
+                                View.horizontal(
+                                  View.text(dep.dependency.artifact.value.padTo(longestArtifactName, ' ')).cyan,
+                                  View.text(dep.dependency.version.value.padTo(longestVersion, ' ')).cyan.dim,
+                                  View.text("→").cyan.dim,
+                                  View.text(version.value).green.underlined
+                                )
+                              }: _*
+                          )
+                          .padding(1)
+                          .renderNow
+                      )
+             } yield ()
+           }
     } yield ()
   }
 }
