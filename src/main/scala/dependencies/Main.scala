@@ -134,9 +134,23 @@ object CliApp extends TerminalApp[Nothing, CliState, Chunk[(DependencyWithLocati
 
     val toggleKeybinding =
       if (state.dependencies(state.index).versions.size > 1) {
-        View.horizontal(
+        View.horizontal(0)(
+          "  ",
           View.text("←/→").blue,
+          " ",
           View.text("toggle version").blue.dim
+        )
+      } else {
+        View.text("")
+      }
+
+    val confirmBinding =
+      if (state.selected.nonEmpty) {
+        View.horizontal(0)(
+          "  ",
+          View.text("enter").blue,
+          " ",
+          View.text("update").blue.dim
         )
       } else {
         View.text("")
@@ -144,17 +158,24 @@ object CliApp extends TerminalApp[Nothing, CliState, Chunk[(DependencyWithLocati
 
     val keybindings =
       View
-        .horizontal(
+        .horizontal(0)(
           View.text("space").blue,
+          " ",
           View.text("toggle").blue.dim,
-          " ",
+          "  ",
           View.text("a").blue,
+          " ",
           View.text("toggle all").blue.dim,
-          " ",
+          "  ",
           View.text("↑/↓").blue,
-          View.text("move up/down").blue.dim,
           " ",
-          toggleKeybinding
+          View.text("move up/down").blue.dim,
+          toggleKeybinding,
+          confirmBinding,
+          "  ",
+          View.text("q").blue,
+          " ",
+          View.text("quit").blue.dim
         )
         .padding(top = 1)
 
@@ -192,9 +213,9 @@ object CliApp extends TerminalApp[Nothing, CliState, Chunk[(DependencyWithLocati
                 (DependencyWithLocation(dep.dependency, dep.location), dep.selectedVersion._2)
               }
             Step.succeed(Chunk.from(chosen))
-          case KeyEvent.Up =>
+          case KeyEvent.Up | KeyEvent.Character('k') =>
             Step.update(state.moveUp)
-          case KeyEvent.Down =>
+          case KeyEvent.Down | KeyEvent.Character('j') =>
             Step.update(state.moveDown)
           case KeyEvent.Right =>
             Step.update(state.rotateVersionRight)
