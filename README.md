@@ -1,5 +1,5 @@
 # scala-interactive-update
-Update your Scala dependencies interactively.
+Update your Scala dependencies (both libraries and plugins) interactively.
 
 ## Installation
 
