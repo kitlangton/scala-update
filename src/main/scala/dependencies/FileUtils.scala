@@ -18,7 +18,10 @@ object FileUtils {
                    else ZStream.succeed(path)
           } yield res
         }
-        .filter(_.toString().endsWith(".scala"))
+        .filter { path =>
+          val pathString = path.toString()
+          pathString.endsWith(".scala") || pathString.endsWith(".sbt")
+        }
     }
 
 }
