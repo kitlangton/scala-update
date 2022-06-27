@@ -1,5 +1,5 @@
 # scala-interactive-update
-Update your sbt dependencies interactively.
+Update your scala dependencies interactively.
 
 ## Installation
 
