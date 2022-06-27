@@ -98,9 +98,9 @@ object CliApp extends TerminalApp[Nothing, CliState, Chunk[(DependencyWithLocati
     val dependencies = state.dependencies.zipWithIndex.map { case (dep, idx) =>
       val selected: View =
         if (state.selected.contains(idx)) {
-          View.text("◉").green
+          View.text("☑").green
         } else {
-          View.text("◯").cyan
+          View.text("☐").cyan
         }
 
       val isActive = idx == state.index
