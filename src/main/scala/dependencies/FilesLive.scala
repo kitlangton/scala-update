@@ -7,18 +7,23 @@ import zio.{Chunk, IO, ZIO}
 import java.io.IOException
 
 final case class FilesLive() extends Files {
-  override def allScalaFiles(path: String): IO[IOException, Chunk[SourceFile]] = {
-    val path0 = Path(path)
-    FileUtils
-      .allScalaFiles(path0 / "project")
-      .concat(ZStream.succeed(path0 / "build.sbt"))
-      .mapZIO { path =>
-        ZIO
-          .readFile(path.toString)
-          .map { content =>
-            SourceFile(path, content)
-          }
-      }
-      .runCollect
+
+  override def allScalaFiles(root: String): IO[IOException, Chunk[SourceFile]] = {
+    val rootPath = Path(root)
+    for {
+      files <- FileUtils
+                 .allScalaFiles(rootPath / "project")
+                 .concat(ZStream.succeed(rootPath / "build.sbt"))
+                 .concat(ZStream.succeed(rootPath / "project" / "plugins.sbt"))
+                 .mapZIO { path =>
+                   ZIO
+                     .readFile(path.toString)
+                     .map { content =>
+                       SourceFile(path, content)
+                     }
+                 }
+                 .runCollect
+    } yield files
   }
+
 }

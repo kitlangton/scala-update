@@ -94,7 +94,7 @@ final case class CliState(
 object CliApp extends TerminalApp[Nothing, CliState, Chunk[(DependencyWithLocation, Version)]] {
   override def render(state: CliState): View = {
     val longestArtifactLength = state.dependencies.flatMap(_.dependencies.map(_.artifact.value.length)).max
-    val longestVersionLength  = state.dependencies.map(_.versions.map(_._2.value.length).max).max
+    val longestVersionLength  = state.dependencies.flatMap(_.dependencies.map(_.version.value.length)).max
     val dependencies = state.dependencies.zipWithIndex.map { case (dep, idx) =>
       val selected: View =
         if (state.selected.contains(idx)) {

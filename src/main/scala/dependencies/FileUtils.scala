@@ -1,6 +1,5 @@
 package dependencies
 
-import zio.ZIO
 import zio.nio.file.{Files, Path}
 import zio.stream.ZStream
 
@@ -18,10 +17,7 @@ object FileUtils {
                    else ZStream.succeed(path)
           } yield res
         }
-        .filter { path =>
-          val pathString = path.toString()
-          pathString.endsWith(".scala") || pathString.endsWith(".sbt")
-        }
+        .filter(_.toString.endsWith(".scala"))
     }
 
 }

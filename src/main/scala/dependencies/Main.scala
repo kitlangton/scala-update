@@ -33,16 +33,18 @@ object Main extends ZIOAppDefault {
   def runSelector(
     options: List[(DependencyWithLocation, UpdateOptions)]
   ): ZIO[DependencyUpdater with TUI, Throwable, Unit] = {
-    val toUpdate =
-      options.groupBy(_._1.location).values.map { depsWithOpts =>
-        val opts: UpdateOptions = depsWithOpts.head._2
-        val deps: NonEmptyChunk[DependencyWithLocation] =
-          NonEmptyChunk.fromIterableOption(depsWithOpts.map(_._1)).get
-        DependencyState.from(deps, opts)
-      }
+    val grouped =
+      Chunk
+        .from(options.groupBy(_._1.location).values.map { depsWithOpts =>
+          val opts: UpdateOptions = depsWithOpts.head._2
+          val deps: NonEmptyChunk[DependencyWithLocation] =
+            NonEmptyChunk.fromIterableOption(depsWithOpts.map(_._1)).get
+          DependencyState.from(deps, opts)
+        })
+        .sortBy(_.dependencies.head.artifact.value)
 
     for {
-      chosen <- CliApp.run(CliState(Chunk.from(toUpdate), 0, Set.empty))
+      chosen <- CliApp.run(CliState(grouped, 0, Set.empty))
       _ <- ZIO.when(chosen.nonEmpty) {
              for {
                _                  <- ZIO.serviceWithZIO[DependencyUpdater](_.runUpdates(chosen))
