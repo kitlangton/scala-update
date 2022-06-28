@@ -70,7 +70,7 @@ jobs:
 
       - name: bump homebrew formula
         env:
-          HOMEBREW_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          HOMEBREW_GITHUB_API_TOKEN: ${{ secrets.HOMEBREW_GITHUB_TOKEN }}
         if: ${{ matrix.os == 'macos' && startsWith(github.ref, 'refs/tags/') }}
         run: |
           brew tap kitlangton/scala-interactive-update
