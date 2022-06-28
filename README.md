@@ -3,6 +3,14 @@ Update your Scala dependencies (both libraries and plugins) interactively. [Vide
 
 ## Installation
 
+### Homebrew (Mac Only)
+
+```shell
+brew install kitlangton/scala-interactive-update/scala-interactive-update
+```
+
+### Manually with GraalVM
+
 1. Build the native image with `show graalvm-native-image:packageBin`.
 
 ```shell
