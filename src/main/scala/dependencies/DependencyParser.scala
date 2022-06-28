@@ -43,35 +43,35 @@ object DependencyParser {
     val dependencies = mutable.ListBuffer.empty[DependencyWithLocation]
     sourceFiles.foreach { sourceFile =>
       sourceFile.tree.traverse {
-        case Term.ApplyInfix(
-              Term.ApplyInfix(Lit.String(group), Term.Name("%" | "%%" | "%%%"), _, List(Lit.String(artifact))),
-              Term.Name("%"),
-              _,
-              List(str @ Lit.String(version))
-            ) =>
+        // Matches String Literal Versions: "zio.dev" %% "zio" % "1.0.0"
+        case GroupAndArtifact(group, artifact, str @ Lit.String(version)) =>
           val location   = Location(path = sourceFile.path, start = str.pos.start, end = str.pos.end)
           val dependency = Dependency(Group(group), Artifact(artifact), Version(version))
           dependencies += DependencyWithLocation(dependency, location)
-        case Term.ApplyInfix(
-              Term.ApplyInfix(Lit.String(group), Term.Name("%" | "%%" | "%%%"), _, List(Lit.String(artifact))),
-              Term.Name("%"),
-              _,
-              List(GetName(name))
-            ) if assignments.contains(name) =>
+        // Matches Identifier Versions: "zio.dev" %% "zio" % zioVersion
+        //                              "zio.dev" %% "zio" % Dependencies.zio
+        case GroupAndArtifact(group, artifact, GetName(name)) if assignments.contains(name) =>
           val assignment = assignments(name)
           val location   = assignment.location
           val dependency = Dependency(Group(group), Artifact(artifact), assignment.version)
           dependencies += DependencyWithLocation(dependency, location)
-//        case Term.ApplyInfix(
-//              Term.ApplyInfix(Lit.String(group), Term.Name("%" | "%%" | "%%%"), _, List(Lit.String(artifact))),
-//              Term.Name("%"),
-//              _,
-//              List(ident)
-//            ) =>
-//          throw new Error(s"Could not find version for $group %% $artifact % $ident")
       }
     }
     dependencies.toList
+  }
+
+  private object GroupAndArtifact {
+    def unapply(tree: Tree): Option[(String, String, Term)] =
+      tree match {
+        case Term.ApplyInfix(
+              Term.ApplyInfix(Lit.String(group), Term.Name("%" | "%%" | "%%%"), _, List(Lit.String(artifact))),
+              Term.Name("%"),
+              _,
+              List(arg)
+            ) =>
+          Some((group, artifact, arg))
+        case _ => None
+      }
   }
 
   object GetName {
