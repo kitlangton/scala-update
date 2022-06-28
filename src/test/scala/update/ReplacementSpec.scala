@@ -20,7 +20,7 @@ object V {
 """
           )
 
-        val assignments = DependencyParser.getAssignments(parsed)
+        val assignments = DependencyParser.parseVersionDefs(parsed)
 
         val result = Replacement.replace(
           parsed.string,

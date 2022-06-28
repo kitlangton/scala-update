@@ -3,6 +3,7 @@ package update
 final case class Group(value: String)    extends AnyVal
 final case class Artifact(value: String) extends AnyVal
 
+// major.minor.patch-prerelease
 final case class Version(value: String) {
   lazy val details: VersionDetails =
     VersionDetails.fromString(value)
@@ -20,6 +21,7 @@ final case class Version(value: String) {
       (major == that.major && minor == that.minor && patch == that.patch && preRelease.isDefined && that.preRelease.isDefined && preRelease.get > that.preRelease.get)
 }
 
+// group %% artifact % version
 final case class Dependency(group: Group, artifact: Artifact, version: Version)
 
 object Dependency {
@@ -29,7 +31,7 @@ object Dependency {
 
 object VersionDetails {
   def fromString(string: String): VersionDetails = {
-    val parts      = string.split("[\\.-]")
+    val parts      = string.split("[.-]")
     val major      = parts.lift(0).flatMap(_.toIntOption).getOrElse(0)
     val minor      = parts.lift(1).flatMap(_.toIntOption).getOrElse(0)
     val patch      = parts.lift(2).flatMap(_.toIntOption).getOrElse(0)

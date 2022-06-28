@@ -1,5 +1,6 @@
 package update
 
+import zio.Chunk
 import zio.nio.file.Path
 import zio.test._
 
@@ -9,7 +10,7 @@ object DependencyParserSpec extends ZIOSpecDefault {
     suite("DependencyParserSpec")(
       test("parse dependencies from trees") {
         val sourceFiles =
-          List(
+          Chunk(
             SourceFile(
               Path("fake"),
               """
@@ -44,7 +45,7 @@ libraryDependencies ++= Seq(
         val deps = DependencyParser.getDependencies(sourceFiles)
 
         val expected =
-          List(
+          Chunk(
             Dependency(Group("dev.zio"), Artifact("zio"), Version("1.0.14")),
             Dependency(Group("dev.zio"), Artifact("zio-test"), Version("1.0.14")),
             Dependency(Group("dev.zio"), Artifact("zio-json"), Version("0.3.0")),

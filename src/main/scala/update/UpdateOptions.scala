@@ -11,22 +11,23 @@ final case class UpdateOptions(
 
   def allVersions: List[Version] = major.toList ++ minor.toList ++ patch.toList ++ preRelease.toList
 
-  def isEmpty: Boolean    = major.isEmpty && minor.isEmpty && patch.isEmpty && preRelease.isEmpty
+  def isEmpty: Boolean = major.isEmpty && minor.isEmpty && patch.isEmpty && preRelease.isEmpty
+
   def isNonEmpty: Boolean = !isEmpty
 }
 
 object UpdateOptions {
 
-  def getOptions(version: Version, versions: List[Version]): UpdateOptions = {
-    val major = version.major
-    val minor = version.minor
-    val patch = version.patch
+  def getOptions(current: Version, available: List[Version]): UpdateOptions = {
+    val major = current.major
+    val minor = current.minor
+    val patch = current.patch
 
     val allNewerVersions =
-      versions.filter(_.isNewerThan(version))
+      available.filter(_.isNewerThan(current))
     val majorVersion =
       allNewerVersions
-        .filter(v => ((version.preRelease.isDefined && v.major == major) || v.major > major) && v.preRelease.isEmpty)
+        .filter(v => ((current.preRelease.isDefined && v.major == major) || v.major > major) && v.preRelease.isEmpty)
         .lastOption
     val minorVersion =
       allNewerVersions
@@ -40,6 +41,8 @@ object UpdateOptions {
     val preReleaseVersions =
       allNewerVersions
         .filter(_.preRelease.isDefined)
+        // TODO: Filter out if the newest major version is newer than the pre-release version
+        .filterNot(v => majorVersion.exists(_.isNewerThan(v)))
         .lastOption
 
     UpdateOptions(majorVersion, minorVersion, patchVersion, preReleaseVersions)

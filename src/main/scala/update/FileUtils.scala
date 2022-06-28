@@ -6,14 +6,18 @@ import zio.stream.ZStream
 import java.io.IOException
 
 object FileUtils {
-  def allScalaFiles(root: Path): ZStream[Any, IOException, Path] =
-    ZStream.whenZIO(Files.isDirectory(root)) {
+
+  /**
+   * Returns a Stream of all Scala
+   */
+  def allScalaFiles(path: Path): ZStream[Any, IOException, Path] =
+    ZStream.whenZIO(Files.isDirectory(path)) {
       Files
-        .newDirectoryStream(root)
+        .newDirectoryStream(path)
         .flatMap { path =>
           for {
-            dir <- ZStream.fromZIO(Files.isDirectory(path))
-            res <- if (dir) allScalaFiles(path)
+            isDir <- ZStream.fromZIO(Files.isDirectory(path))
+            res <- if (isDir) allScalaFiles(path)
                    else ZStream.succeed(path)
           } yield res
         }
