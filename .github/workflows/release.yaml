@@ -69,5 +69,6 @@ jobs:
           HOMEBREW_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         if: ${{ matrix.os == 'macos' }}
         run: |
+          brew tap kitlangton/scala-interactive-update
           brew bump-formula-pr kitlangton/scala-interactive-update/scala-interactive-update -f --no-browse --no-audit \
           --url="https://github.com/kitlangton/scala-interactive-update/releases/download/v0.1.9/sup-macos-amd64"
