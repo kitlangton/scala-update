@@ -27,8 +27,8 @@ object Main extends ZIOAppDefault {
     ZIO.debug(
       View
         .vertical(
-          View.text("SBT INTERACTIVE UPDATE ERROR").red,
-          View.text("────────────────────────────").red.dim,
+          View.text("SCALA INTERACTIVE UPDATE ERROR").red,
+          View.text("──────────────────────────────").red.dim,
           View.horizontal(
             "I could not find a",
             View.text("build.sbt").red.underlined,

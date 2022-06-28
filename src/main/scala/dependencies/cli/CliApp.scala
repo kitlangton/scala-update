@@ -214,8 +214,8 @@ object CliApp extends TerminalApp[Nothing, CliState, Chunk[(DependencyWithLocati
     View
       .vertical(
         Chunk(
-          View.text("SBT INTERACTIVE UPDATE").blue,
-          View.text("──────────────────────").blue.dim
+          View.text("SCALA INTERACTIVE UPDATE").blue,
+          View.text("────────────────────────").blue.dim
         ) ++
           dependencies ++
           Chunk(
