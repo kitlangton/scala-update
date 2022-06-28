@@ -19,7 +19,7 @@ lazy val root = (project in file("."))
       "dev.zio"              %% "zio-test-sbt" % zioVersion % Test,
       "io.get-coursier"      %% "coursier"     % coursierVersion,
       "org.scalameta"        %% "scalameta"    % "4.5.9",
-      "io.github.kitlangton" %% "zio-tui"      % "0.0.1"
+      "io.github.kitlangton" %% "zio-tui"      % "0.1.2"
     ),
 //    Compile / mainClass := Some("dependencies.cli.Main"),
     testFrameworks += new TestFramework("zio.test.sbt.ZTestFramework"),
