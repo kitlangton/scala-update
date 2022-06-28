@@ -53,9 +53,13 @@ object DependencyState {
 
 final case class CliState(
   dependencies: Chunk[DependencyState],
-  index: Int,
-  selected: Set[Int]
+  index: Int = 0,
+  selected: Set[Int] = Set.empty,
+  showGroups: Boolean = true
 ) {
+
+  def toggleShowGroups: CliState =
+    copy(showGroups = !showGroups)
 
   def toggle: CliState = {
     val newSelected =
@@ -93,6 +97,7 @@ final case class CliState(
 
 object CliApp extends TerminalApp[Nothing, CliState, Chunk[(DependencyWithLocation, Version)]] {
   override def render(state: CliState): View = {
+    val longestGroupLength    = state.dependencies.flatMap(_.dependencies.map(_.group.value.length)).max
     val longestArtifactLength = state.dependencies.flatMap(_.dependencies.map(_.artifact.value.length)).max
     val longestVersionLength  = state.dependencies.flatMap(_.dependencies.map(_.version.value.length)).max
     val dependencies = state.dependencies.zipWithIndex.map { case (dep, idx) =>
@@ -128,16 +133,30 @@ object CliApp extends TerminalApp[Nothing, CliState, Chunk[(DependencyWithLocati
         if (dep.versions.size > 1 && isActive) View.text(dep.selectedVersion._1.toString).yellow
         else View.text("")
 
+      val groupView = Chunk.from(Option.when(state.showGroups) {
+        View.horizontal(
+          View.text(dep.dependencies.head.group.value.padTo(longestGroupLength, ' ')).cyan,
+          View.text("%%").cyan.dim
+        )
+      })
+
       View.horizontal(1, VerticalAlignment.top)(
-        View.horizontal(0)(cursor, selected),
-        View.vertical(
-          dep.dependencies.map { dep =>
-            View.text(dep.artifact.value.padTo(longestArtifactLength, ' ')).cyan
-          }: _*
-        ),
-        View.text(dep.dependencies.head.version.value.padTo(longestVersionLength, ' ')).cyan.dim,
-        View.text("→").cyan.dim,
-        View.horizontal((versions :+ versionMode): _*)
+        Chunk(
+          View.horizontal(0)(cursor, selected)
+        ) ++ groupView ++
+          Chunk(
+            View.vertical(
+              dep.dependencies.map { dep =>
+                View.text(dep.artifact.value.padTo(longestArtifactLength, ' ')).cyan
+              }: _*
+            )
+          ) ++
+          Chunk.from(Option.when(state.showGroups)(View.text("%").cyan.dim)) ++
+          Chunk(
+            View.text(dep.dependencies.head.version.value.padTo(longestVersionLength, ' ')).cyan.dim,
+            View.text("→").cyan.dim,
+            View.horizontal((versions :+ versionMode): _*)
+          ): _*
       )
     }
 
@@ -181,6 +200,10 @@ object CliApp extends TerminalApp[Nothing, CliState, Chunk[(DependencyWithLocati
           View.text("move up/down").blue.dim,
           toggleKeybinding,
           confirmBinding,
+          "  ",
+          View.text("g").blue,
+          " ",
+          View.text(if (state.showGroups) "hide groups" else "show groups").blue.dim,
           "  ",
           View.text("q").blue,
           " ",
@@ -228,6 +251,8 @@ object CliApp extends TerminalApp[Nothing, CliState, Chunk[(DependencyWithLocati
             Step.update(state.moveUp)
           case KeyEvent.Down | KeyEvent.Character('j') =>
             Step.update(state.moveDown)
+          case KeyEvent.Character('g') =>
+            Step.update(state.toggleShowGroups)
           case KeyEvent.Right =>
             Step.update(state.nextVersion)
           case KeyEvent.Left =>
