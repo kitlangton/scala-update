@@ -56,27 +56,30 @@ object DependencyParser {
               Term.ApplyInfix(Lit.String(group), Term.Name("%" | "%%" | "%%%"), _, List(Lit.String(artifact))),
               Term.Name("%"),
               _,
-              List(ident)
-            ) if assignments.contains(getName(ident)) =>
-          val assignment = assignments(getName(ident))
+              List(GetName(name))
+            ) if assignments.contains(name) =>
+          val assignment = assignments(name)
           val location   = assignment.location
           val dependency = Dependency(Group(group), Artifact(artifact), assignment.version)
           dependencies += DependencyWithLocation(dependency, location)
-        case Term.ApplyInfix(
-              Term.ApplyInfix(Lit.String(group), Term.Name("%" | "%%" | "%%%"), _, List(Lit.String(artifact))),
-              Term.Name("%"),
-              _,
-              List(ident)
-            ) =>
+//        case Term.ApplyInfix(
+//              Term.ApplyInfix(Lit.String(group), Term.Name("%" | "%%" | "%%%"), _, List(Lit.String(artifact))),
+//              Term.Name("%"),
+//              _,
+//              List(ident)
+//            ) =>
 //          throw new Error(s"Could not find version for $group %% $artifact % $ident")
       }
     }
     dependencies.toList
   }
 
-  def getName(tree: Tree): String =
-    tree match {
-      case Term.Select(_, name) => name.syntax
-      case Term.Name(name)      => name
-    }
+  object GetName {
+    def unapply(tree: Tree): Option[String] =
+      tree match {
+        case Term.Select(_, name) => Some(name.syntax)
+        case Term.Name(name)      => Some(name)
+        case _                    => None
+      }
+  }
 }
