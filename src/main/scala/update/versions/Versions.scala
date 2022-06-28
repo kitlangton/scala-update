@@ -1,6 +1,6 @@
-package dependencies.versions
+package update.versions
 
-import dependencies.{Artifact, Dependency, Group, Version}
+import update.{Artifact, Dependency, Group, Version}
 import zio._
 
 trait Versions {

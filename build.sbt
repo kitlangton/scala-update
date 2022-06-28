@@ -1,7 +1,23 @@
-ThisBuild / scalaVersion     := "2.13.8"
-ThisBuild / version          := "0.1.0-SNAPSHOT"
-ThisBuild / organization     := "com.example"
-ThisBuild / organizationName := "example"
+inThisBuild(
+  List(
+    name               := "scala-interactive-update",
+    normalizedName     := "scala-interactive-update",
+    organization       := "com.kitlangton",
+    scalaVersion       := "2.13.8",
+    crossScalaVersions := Seq("2.13.8"),
+    organization       := "io.github.kitlangton",
+    homepage           := Some(url("https://github.com/kitlangton/scala-interactive-update")),
+    licenses           := List("Apache-2.0" -> url("http://www.apache.org/licenses/LICENSE-2.0")),
+    developers := List(
+      Developer(
+        "kitlangton",
+        "Kit Langton",
+        "kit.langton@gmail.com",
+        url("https://github.com/kitlangton")
+      )
+    )
+  )
+)
 
 val zioVersion      = "2.0.0"
 val zioNioVersion   = "2.0.0"
@@ -21,7 +37,7 @@ lazy val root = (project in file("."))
       "org.scalameta"        %% "scalameta"    % "4.5.9",
       "io.github.kitlangton" %% "zio-tui"      % "0.1.2"
     ),
-//    Compile / mainClass := Some("dependencies.cli.Main"),
+    Compile / mainClass := Some("update.Main"),
     testFrameworks += new TestFramework("zio.test.sbt.ZTestFramework"),
     graalVMNativeImageOptions ++= Seq(
       "--no-fallback",

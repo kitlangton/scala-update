@@ -1,6 +1,6 @@
-package dependencies
+package update
 
-import dependencies.versions.Versions
+import update.versions.Versions
 import zio.ZIO
 import zio.test._
 

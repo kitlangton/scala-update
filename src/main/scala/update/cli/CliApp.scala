@@ -1,7 +1,7 @@
-package dependencies.cli
+package update.cli
 
-import dependencies._
-import dependencies.versions.Versions
+import update._
+import update.versions.Versions
 import tui.TerminalApp.Step
 import tui._
 import view._

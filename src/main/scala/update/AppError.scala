@@ -1,4 +1,4 @@
-package dependencies
+package update
 
 sealed trait AppError extends Throwable
 

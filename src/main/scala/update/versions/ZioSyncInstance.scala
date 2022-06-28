@@ -1,4 +1,4 @@
-package dependencies.versions
+package update.versions
 
 import coursier.util.Sync
 import zio.{Task, ZIO}

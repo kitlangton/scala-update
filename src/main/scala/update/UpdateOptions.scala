@@ -1,4 +1,4 @@
-package dependencies
+package update
 
 final case class UpdateOptions(
   major: Option[Version],

@@ -1,9 +1,9 @@
-package dependencies.versions
+package update.versions
 
 import coursier.cache.FileCache
 import coursier.{Module, ModuleName, Organization, Repositories}
-import dependencies.versions.ZioSyncInstance._
-import dependencies.{Artifact, DependencyUpdater, Files, Group, Version}
+import update.versions.ZioSyncInstance._
+import update.{Artifact, DependencyUpdater, Files, Group, Version}
 import zio._
 
 final case class VersionsLive() extends Versions {

@@ -1,7 +1,7 @@
-package dependencies
+package update
 
-import dependencies.cli.{CliApp, CliState, DependencyState}
-import dependencies.versions.Versions
+import update.cli.{CliApp, CliState, DependencyState}
+import update.versions.Versions
 import tui.TUI
 import view.View
 import zio._

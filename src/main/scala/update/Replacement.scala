@@ -1,4 +1,4 @@
-package dependencies
+package update
 
 import scala.annotation.tailrec
 import scala.collection.mutable

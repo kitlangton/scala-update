@@ -1,4 +1,4 @@
-package dependencies
+package update
 
 import zio.nio.file.Path
 import zio.stream.ZStream
