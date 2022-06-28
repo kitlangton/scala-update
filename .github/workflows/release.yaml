@@ -7,9 +7,6 @@ jobs:
     strategy:
       matrix:
         os: [macos, ubuntu]
-# Disabling windows due to: https://github.com/oracle/graal/issues/4502
-# Scheduled fix release: 22.2.0 (currently on 22.1.0)
-#        os: [macos, ubuntu, windows]
         include:
           - os: ubuntu
             runs: ubuntu-latest
@@ -17,9 +14,6 @@ jobs:
           - os: macos
             runs: macos-latest
             artifact-name: sup-macos-amd64
-#          - os: windows
-#            runs: windows-2019
-#            artifact-name: sup-windows-amd64.exe
     runs-on: ${{ matrix.runs }}
 
     steps:
@@ -35,21 +29,12 @@ jobs:
           components: 'native-image'
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: build for windows
-        if: matrix.os == 'windows'
-        shell: cmd
-        run: |
-          call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
-          ./sbt graalvm-native-image:packageBin
-
       - name: build for ${{ matrix.os }}
-        if: matrix.os != 'windows'
         run: |
           ./sbt graalvm-native-image:packageBin
 
       # disable on window: https://github.com/upx/upx/issues/559
       - name: run upx on ${{ matrix.os }}
-        if: matrix.os != 'windows'
         uses: svenstaro/upx-action@v2
         with:
           file: target/graalvm-native-image/scala-interactive-update
