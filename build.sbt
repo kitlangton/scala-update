@@ -47,8 +47,8 @@ lazy val root = (project in file("."))
     scalacOptions ++= Seq(
       "-deprecation",
       "-unchecked",
-      "-Wunused",
-      "-Xfatal-warnings"
+      "-Wunused"
+//      "-Xfatal-warnings"
     )
   )
   .enablePlugins(GraalVMNativeImagePlugin)

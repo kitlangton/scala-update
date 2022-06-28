@@ -27,7 +27,7 @@ object DependencyParser {
 
   def getDependencies(sources: Chunk[SourceFile]): Chunk[DependencyWithLocation] = {
     val versionDefs = parseVersionDefs(sources)
-    val builder     = ChunkBuilder.make[DependencyWithLocation]
+    val builder     = ChunkBuilder.make[DependencyWithLocation]()
 
     sources.foreach { source =>
       source.tree.traverse {
