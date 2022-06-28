@@ -19,39 +19,44 @@ jobs:
     steps:
       - name: checkout
         uses: actions/checkout@v2
-
       - uses: coursier/cache-action@v6
 
+      - name: compile for ${{ matrix.os }}
+        run: |
+          ./sbt compile
+
       - uses: graalvm/setup-graalvm@v1
+        if: ${{ contains(github.event.ref, 'tags') }}
         with:
           version: 'latest'
           java-version: '17'
           components: 'native-image'
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
+
       - name: build for ${{ matrix.os }}
+        if: ${{ contains(github.event.ref, 'tags') }}
         run: |
           ./sbt graalvm-native-image:packageBin
 
       # disable on window: https://github.com/upx/upx/issues/559
       - name: run upx on ${{ matrix.os }}
         uses: svenstaro/upx-action@v2
+        if: ${{ contains(github.event.ref, 'tags') }}
         with:
           file: target/graalvm-native-image/scala-interactive-update
           args: --best --lzma
 
       - name: upload ${{ matrix.os }}
         uses: actions/upload-artifact@v2
+        if: ${{ contains(github.event.ref, 'tags') }}
         with:
           name: ${{ matrix.artifact-name }}
           path: target/graalvm-native-image/scala-interactive-update
 
-      - name: inspect-event
-        run: |
-          echo "{{ github.event.ref_type }}"
-
       - name: release binaries
         uses: svenstaro/upload-release-action@v2
+        if: ${{ contains(github.event.ref, 'tags') }}
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: target/graalvm-native-image/scala-interactive-update
