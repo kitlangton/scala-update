@@ -21,9 +21,9 @@ jobs:
         uses: actions/checkout@v2
       - uses: coursier/cache-action@v6
 
-      - name: compile for ${{ matrix.os }}
+      - name: test for ${{ matrix.os }}
         run: |
-          ./sbt compile
+          ./sbt test
 
       - uses: graalvm/setup-graalvm@v1
         if: ${{ startsWith(github.ref, 'refs/tags/') }}
@@ -63,11 +63,3 @@ jobs:
           asset_name: ${{ matrix.artifact-name }}
           overwrite: true
           tag: ${{ github.ref }}
-
-      - name: Update Homebrew Formula
-        uses: izumin5210/action-homebrew-tap@releases/v0
-        if: startsWith(github.ref, 'refs/tags)/')
-        with:
-          tap: kitlangton/homebrew-scala-interactive-update
-          token: ${{ secrets.GITHUB_TOKEN }}
-          tap-token: ${{ secrets.GITHUB_TOKEN }}
