@@ -13,10 +13,15 @@ object DependencyParserSpec extends ZIOSpecDefault {
             SourceFile(
               Path("fake"),
               """
+
 val V = {
   val zio = "1.0.14"
   val `zio-json` = "0.3.0"
   val other = "3.5.0"
+}
+
+val X = {
+  val zio = "0.0.7"
 }
 
 libraryDependencies ++= Seq(
@@ -53,6 +58,26 @@ libraryDependencies ++= Seq(
           )
 
         assertTrue(deps.map(_.dependency) == expected)
+      },
+      test("parse dependencies from string interpolation") {
+        val sourceFiles =
+          List(
+            SourceFile(
+              Path("fake"),
+              """
+val V = {
+  val foo = "1.23.0"
+}
+
+libraryDependencies += "org.example" % "artifact" % s"v4-rev516-${V.foo}"
+"""
+            )
+          )
+
+        val obtained = DependencyParser.getDependencies(sourceFiles).head.dependency.version.value
+        val expected = "v4-rev516-1.23.0"
+
+        assertTrue(obtained == expected)
       }
     )
 
