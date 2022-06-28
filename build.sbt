@@ -2,10 +2,9 @@ inThisBuild(
   List(
     name               := "scala-interactive-update",
     normalizedName     := "scala-interactive-update",
-    organization       := "com.kitlangton",
+    organization       := "io.github.kitlangton",
     scalaVersion       := "2.13.8",
     crossScalaVersions := Seq("2.13.8"),
-    organization       := "io.github.kitlangton",
     homepage           := Some(url("https://github.com/kitlangton/scala-interactive-update")),
     licenses           := List("Apache-2.0" -> url("http://www.apache.org/licenses/LICENSE-2.0")),
     developers := List(
