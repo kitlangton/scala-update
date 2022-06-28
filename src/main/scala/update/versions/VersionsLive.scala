@@ -3,7 +3,7 @@ package update.versions
 import coursier.cache.FileCache
 import coursier.{Module, ModuleName, Organization, Repositories}
 import update.versions.ZioSyncInstance._
-import update.{Artifact, DependencyUpdater, Files, Group, Version}
+import update.{Artifact, Group, Version}
 import zio._
 
 final case class VersionsLive() extends Versions {
@@ -17,7 +17,6 @@ final case class VersionsLive() extends Versions {
         // Gets plugin versions from Maven Central
         getVersions(group, artifact, "2.12", Some("1.0"))
       }
-//      .orElseSucceed(List.empty)
 
   private def getVersions(
     group: Group,

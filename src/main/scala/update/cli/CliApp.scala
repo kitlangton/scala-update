@@ -1,7 +1,6 @@
 package update.cli
 
 import update._
-import update.versions.Versions
 import tui.TerminalApp.Step
 import tui._
 import view._
@@ -230,7 +229,7 @@ object CliApp extends TerminalApp[Nothing, CliState, Chunk[(DependencyWithLocati
     event: TerminalEvent[Nothing]
   ): TerminalApp.Step[CliState, Chunk[(DependencyWithLocation, Version)]] =
     event match {
-      case TerminalEvent.UserEvent(event) =>
+      case TerminalEvent.UserEvent(_) =>
         ???
       case TerminalEvent.SystemEvent(keyEvent) =>
         keyEvent match {

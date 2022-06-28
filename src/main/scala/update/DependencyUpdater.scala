@@ -33,7 +33,7 @@ case class DependencyUpdater(versions: Versions, files: Files) {
 
     sourceFiles <- files.allBuildSources(pwd)
     deps         = DependencyParser.getDependencies(sourceFiles)
-    updates     <- ZIO.foreach(deps)(getUpdateOptions)
+    updates     <- ZIO.foreachPar(deps)(getUpdateOptions)
   } yield updates
 
   private def groupUpdatesByFile(
