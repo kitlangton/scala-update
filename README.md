@@ -5,11 +5,11 @@ Update your Scala dependencies (both libraries and plugins) interactively. [Vide
 
 ### Homebrew (Mac Only)
 
-This will work best on Intel-based Macs for the time being, as GitHub actions do not support M1 builds yet. If you'd like faster binaries on M1, install manually with GraalVM (the next step).
-
 ```shell
 brew install kitlangton/scala-interactive-update/scala-interactive-update
 ```
+
+*If you'd like slightly faster binaries on an M1 mac, install manually with GraalVM (the next step).*
 
 ### Manually with GraalVM
 
