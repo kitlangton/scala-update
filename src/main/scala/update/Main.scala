@@ -18,6 +18,7 @@ import zio._
  */
 object Main extends ZIOAppDefault {
 
+  // TODO: Refactor all this ugliness
   val run = {
     for {
       options0 <- ZIO.serviceWithZIO[DependencyUpdater](_.allUpdateOptions)

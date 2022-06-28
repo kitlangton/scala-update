@@ -20,15 +20,15 @@ final case class DependencyState(
   location: Location,
   dependencies: NonEmptyChunk[Dependency],
   versions: NonEmptyChunk[(VersionType, Version)],
-  selectedIndex: Int
+  versionIndex: Int
 ) {
-  def selectedVersion: (VersionType, Version) = versions(selectedIndex)
+  def selectedVersion: (VersionType, Version) = versions(versionIndex)
 
   def nextVersion: DependencyState =
-    copy(selectedIndex = (selectedIndex + 1) min (versions.size - 1))
+    copy(versionIndex = (versionIndex + 1) min (versions.size - 1))
 
   def prevVersion: DependencyState =
-    copy(selectedIndex = (selectedIndex - 1) max 0)
+    copy(versionIndex = (versionIndex - 1) max 0)
 
 }
 
@@ -53,7 +53,7 @@ object DependencyState {
 
 final case class CliState(
   dependencies: Chunk[DependencyState],
-  index: Int = 0,
+  cursorIndex: Int = 0,
   selected: Set[Int] = Set.empty,
   showGroups: Boolean = false
 ) {
@@ -63,8 +63,8 @@ final case class CliState(
 
   def toggle: CliState = {
     val newSelected =
-      if (selected(index)) selected - index
-      else selected + index
+      if (selected(cursorIndex)) selected - cursorIndex
+      else selected + cursorIndex
     copy(selected = newSelected)
   }
 
@@ -76,20 +76,20 @@ final case class CliState(
   }
 
   def moveUp: CliState =
-    if (index == 0) this
-    else copy(index = index - 1)
+    if (cursorIndex == 0) this
+    else copy(cursorIndex = cursorIndex - 1)
 
   def moveDown: CliState =
-    if (index == dependencies.size - 1) this
-    else copy(index = index + 1)
+    if (cursorIndex == dependencies.size - 1) this
+    else copy(cursorIndex = cursorIndex + 1)
 
   def nextVersion: CliState = {
-    val newDependencies = dependencies.updated(index, dependencies(index).nextVersion)
+    val newDependencies = dependencies.updated(cursorIndex, dependencies(cursorIndex).nextVersion)
     copy(dependencies = newDependencies)
   }
 
   def prevVersion: CliState = {
-    val newDependencies = dependencies.updated(index, dependencies(index).prevVersion)
+    val newDependencies = dependencies.updated(cursorIndex, dependencies(cursorIndex).prevVersion)
     copy(dependencies = newDependencies)
   }
 
@@ -108,7 +108,7 @@ object CliApp extends TerminalApp[Nothing, CliState, Chunk[(DependencyWithLocati
           View.text("☐").cyan.dim
         }
 
-      val isActive = idx == state.index
+      val isActive = idx == state.cursorIndex
 
       val cursor: View =
         if (isActive) {
@@ -119,9 +119,9 @@ object CliApp extends TerminalApp[Nothing, CliState, Chunk[(DependencyWithLocati
 
       val versions = dep.versions.toChunk.zipWithIndex.flatMap { case ((_, v), versionIdx) =>
         Chunk(
-          if (versionIdx == dep.selectedIndex && state.selected.contains(idx)) {
+          if (versionIdx == dep.versionIndex && state.selected.contains(idx)) {
             View.text(v.value).green.underlined
-          } else if (versionIdx == dep.selectedIndex) {
+          } else if (versionIdx == dep.versionIndex) {
             View.text(v.value).green
           } else {
             View.text(v.value).green.dim
@@ -161,7 +161,7 @@ object CliApp extends TerminalApp[Nothing, CliState, Chunk[(DependencyWithLocati
     }
 
     val toggleKeybinding =
-      if (state.dependencies(state.index).versions.size > 1) {
+      if (state.dependencies(state.cursorIndex).versions.size > 1) {
         View.horizontal(0)(
           "  ",
           View.text("←/→").blue,
