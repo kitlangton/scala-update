@@ -10,10 +10,10 @@ jobs:
         include:
           - os: ubuntu
             runs: ubuntu-latest
-            artifact-name: sup-linux-amd-${{ github.tag }}
+            artifact-name: sup-linux-amd
           - os: macos
             runs: macos-latest
-            artifact-name: sup-macos-amd-${{ github.tag }}
+            artifact-name: sup-macos-amd
     runs-on: ${{ matrix.runs }}
 
     steps:
@@ -64,11 +64,15 @@ jobs:
           overwrite: true
           tag: ${{ github.ref }}
 
+      - id: get_version
+        if: ${{ matrix.os == 'macos' && startsWith(github.ref, 'refs/tags/') }}
+        uses: battila7/get-version-action@v2
+
       - name: bump homebrew formula
         env:
           HOMEBREW_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        if: ${{ matrix.os == 'macos' }}
+        if: ${{ matrix.os == 'macos' && startsWith(github.ref, 'refs/tags/') }}
         run: |
           brew tap kitlangton/scala-interactive-update
           brew bump-formula-pr kitlangton/scala-interactive-update/scala-interactive-update -f --no-browse --no-audit \
-          --url="https://github.com/kitlangton/scala-interactive-update/releases/download/${{ github.tag }}/${{ matrix.artifact-name }}"
+          --url="https://github.com/kitlangton/scala-interactive-update/releases/download/${{ steps.get_version.outputs.version }}/${{ matrix.artifact-name }}"
