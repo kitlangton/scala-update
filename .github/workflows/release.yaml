@@ -10,10 +10,10 @@ jobs:
         include:
           - os: ubuntu
             runs: ubuntu-latest
-            artifact-name: sup-linux-amd64
+            artifact-name: sup-linux-amd-${{ github.tag }}
           - os: macos
             runs: macos-latest
-            artifact-name: sup-macos-amd64
+            artifact-name: sup-macos-amd-${{ github.tag }}
     runs-on: ${{ matrix.runs }}
 
     steps:
@@ -64,11 +64,11 @@ jobs:
           overwrite: true
           tag: ${{ github.ref }}
 
-#      - name: bump homebrew formula
-#        env:
-#          HOMEBREW_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-#        if: ${{ matrix.os == 'macos' }}
-#        run: |
-#          brew tap kitlangton/scala-interactive-update
-#          brew bump-formula-pr kitlangton/scala-interactive-update/scala-interactive-update -f --no-browse --no-audit \
-#          --url="https://github.com/kitlangton/scala-interactive-update/releases/download/v0.1.9/sup-macos-amd64"
+      - name: bump homebrew formula
+        env:
+          HOMEBREW_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        if: ${{ matrix.os == 'macos' }}
+        run: |
+          brew tap kitlangton/scala-interactive-update
+          brew bump-formula-pr kitlangton/scala-interactive-update/scala-interactive-update -f --no-browse --no-audit \
+          --url="https://github.com/kitlangton/scala-interactive-update/releases/download/${{ github.tag }}/${{ matrix.artifact-name }}"
