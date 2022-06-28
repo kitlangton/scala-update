@@ -55,7 +55,7 @@ final case class CliState(
   dependencies: Chunk[DependencyState],
   index: Int = 0,
   selected: Set[Int] = Set.empty,
-  showGroups: Boolean = true
+  showGroups: Boolean = false
 ) {
 
   def toggleShowGroups: CliState =
