@@ -23,7 +23,24 @@ object Main extends ZIOAppDefault {
                  .renderNow
              )
     } yield ()
-  }.provide(
+  }.catchSome { case AppError.MissingBuildSbt =>
+    ZIO.debug(
+      View
+        .vertical(
+          View.text("SBT INTERACTIVE UPDATE ERROR").red,
+          View.text("────────────────────────────").red.dim,
+          View.horizontal(
+            "I could not find a",
+            View.text("build.sbt").red.underlined,
+            s"file in the current directory."
+          ),
+          View.text("Are you running this command from a valid sbt project root?").dim
+        )
+        .padding(1)
+        .renderNow
+    )
+
+  } provide (
     TUI.live(false),
     DependencyUpdater.live,
     Versions.live,

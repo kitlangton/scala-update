@@ -27,6 +27,7 @@ case class DependencyUpdater(versions: Versions, files: Files) {
 
   def allUpdateOptions: IO[Throwable, List[(DependencyWithLocation, UpdateOptions)]] = for {
     pwd         <- System.property("user.dir").someOrFailException
+    _           <- ZIO.fail(AppError.MissingBuildSbt).unlessZIO(zio.nio.file.Files.exists(Path(pwd) / "build.sbt"))
     sourceFiles <- files.allScalaFiles(pwd)
     deps         = DependencyParser.getDependencies(sourceFiles.toList)
     updates     <- ZIO.foreach(deps)(getUpgradeOptions)
