@@ -46,8 +46,11 @@ jobs:
           name: ${{ matrix.artifact-name }}
           path: target/graalvm-native-image/scala-interactive-update
 
+      - name: inspect-event
+        run: |
+          echo "{{ github.event.ref_type }}"
+
       - name: release binaries
-        if: ${{ github.event.ref_type == 'tag' }}
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
