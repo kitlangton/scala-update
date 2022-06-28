@@ -6,7 +6,8 @@ Update your Scala dependencies (both libraries and plugins) interactively. [Vide
 ### Homebrew (Mac Only)
 
 ```shell
-brew install kitlangton/scala-interactive-update/scala-interactive-update
+brew tap kitlangton/homebrew-scala-interactive-update
+brew install kitlangton/scala-interactive-update
 ```
 
 *If you'd like slightly faster binaries on an M1 mac, install manually with GraalVM (the next step).*
