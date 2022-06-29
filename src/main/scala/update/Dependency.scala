@@ -3,7 +3,9 @@ package update
 final case class Group(value: String)    extends AnyVal
 final case class Artifact(value: String) extends AnyVal
 
-final case class PreRelease(value: String) extends AnyVal
+final case class PreRelease(value: String) extends AnyVal {
+  override def toString: String = value
+}
 
 object PreRelease {
 
