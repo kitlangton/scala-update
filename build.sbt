@@ -23,7 +23,7 @@ inThisBuild(
 val zioVersion       = "2.0.0"
 val zioNioVersion    = "2.0.0"
 val coursierVersion  = "2.1.0-M6-28-gbad85693f"
-val zioTuiVersion    = "0.1.3"
+val zioTuiVersion    = "0.1.4"
 val scalaMetaVersion = "4.5.9"
 
 lazy val root = (project in file("."))
