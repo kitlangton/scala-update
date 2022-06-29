@@ -22,6 +22,7 @@ object PreRelease {
               case Re("M", m, _) => n.toInt compare m.toInt
               case _ => 1
         }
+        case _ => -1
       }
   }
   implicit val ordered     = Ordered.orderingToOrdered[PreRelease] _
