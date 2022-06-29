@@ -16,7 +16,8 @@ val zioVersion = "1.0.12"
 libraryDependencies ++= Seq(
   "dev.zio" %% "zio" % zioVersion,
   "dev.zio" %% "zio-json" % "0.2.0",
-  "io.getquill" %% "quill-jdbc-zio" % Dependencies.quill
+  "io.getquill" %% "quill-jdbc-zio" % Dependencies.quill,
+  "dev.cheleb" %% "zio-pravega" % "0.1.0-RC12"
 )
 """
 
@@ -27,7 +28,8 @@ val zioVersion = "2.0.0"
 libraryDependencies ++= Seq(
   "dev.zio" %% "zio" % zioVersion,
   "dev.zio" %% "zio-json" % "0.3.1",
-  "io.getquill" %% "quill-jdbc-zio" % Dependencies.quill
+  "io.getquill" %% "quill-jdbc-zio" % Dependencies.quill,
+  "dev.cheleb" %% "zio-pravega" % "0.1.0-RC12"
 )
 """
 
@@ -73,7 +75,8 @@ object Dependencies {
         Map(
           (Group("dev.zio"), Artifact("zio"))                -> List(Version("2.0.0")),
           (Group("io.getquill"), Artifact("quill-jdbc-zio")) -> List(Version("0.9.5")),
-          (Group("dev.zio"), Artifact("zio-json"))           -> List(Version("0.3.1"))
+          (Group("dev.zio"), Artifact("zio-json"))           -> List(Version("0.3.1")),
+          (Group("dev.cheleb"), Artifact("zio-pravega"))     -> List(Version("0.1.0-RC9"))
         )
       )
     )

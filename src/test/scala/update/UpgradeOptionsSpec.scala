@@ -60,6 +60,7 @@ object UpgradeOptionsSpec extends ZIOSpecDefault {
             Version("1.0.0-RC1"),
             List(
               Version("1.0.0"),
+              Version("1.0.0-alpha1"),
               Version("1.0.0-RC2")
             )
           )
