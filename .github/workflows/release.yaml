@@ -52,7 +52,7 @@ jobs:
         uses: svenstaro/upx-action@v2
         if: ${{ startsWith(github.ref, 'refs/tags/') }}
         with:
-          file: target/graalvm-native-image/scala-interactive-update
+          file: target/graalvm-native-image/scala-update
           args: --best --lzma
 
       - name: upload ${{ matrix.os }}
@@ -60,14 +60,14 @@ jobs:
         if: ${{ startsWith(github.ref, 'refs/tags/') }}
         with:
           name: ${{ matrix.artifact-name }}
-          path: target/graalvm-native-image/scala-interactive-update
+          path: target/graalvm-native-image/scala-update
 
       - name: release binaries
         uses: svenstaro/upload-release-action@v2
         if: ${{ startsWith(github.ref, 'refs/tags/') }}
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: target/graalvm-native-image/scala-interactive-update
+          file: target/graalvm-native-image/scala-update
           asset_name: ${{ matrix.artifact-name }}
           overwrite: true
           tag: ${{ github.ref }}
@@ -81,6 +81,6 @@ jobs:
           HOMEBREW_GITHUB_API_TOKEN: ${{ secrets.HOMEBREW_GITHUB_TOKEN }}
         if: ${{ matrix.os == 'macos' && startsWith(github.ref, 'refs/tags/') }}
         run: |
-          brew tap kitlangton/scala-interactive-update
-          brew bump-formula-pr kitlangton/scala-interactive-update/scala-interactive-update -f --no-browse --no-audit \
-          --url="https://github.com/kitlangton/scala-interactive-update/releases/download/${{ steps.get_version.outputs.version }}/${{ matrix.artifact-name }}"
+          brew tap kitlangton/tap
+          brew bump-formula-pr kitlangton/tap/scala-update -f --no-browse --no-audit \
+          --url="https://github.com/kitlangton/scala-update/releases/download/${{ steps.get_version.outputs.version }}/${{ matrix.artifact-name }}"

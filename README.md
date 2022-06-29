@@ -1,4 +1,4 @@
-# scala-interactive-update
+# scala-update
 [![Release Artifacts][Badge-SonatypeReleases]][Link-SonatypeReleases]
 
 Update your Scala dependencies (both libraries and plugins) interactively. [Video Demo](https://twitter.com/kitlangton/status/1541417514823028740).
@@ -8,7 +8,7 @@ Update your Scala dependencies (both libraries and plugins) interactively. [Vide
 ### Homebrew (Mac Only)
 
 ```shell
-brew install kitlangton/scala-interactive-update/scala-interactive-update
+brew install kitlangton/tap/scala-update
 ```
 
 *If you'd like slightly faster binaries on an M1 mac, install manually with GraalVM (the next step).*
@@ -19,17 +19,17 @@ brew install kitlangton/scala-interactive-update/scala-interactive-update
 
 ```shell
 sbt 'show graalvm-native-image:packageBin'
-# [info] ~/code/sbt-interactive-update/target/graalvm-native-image/scala-interactive-update
+# [info] ~/code/sbt-interactive-update/target/graalvm-native-image/scala-update
 ```
 
 2. Move the generated binary onto your `PATH`.
 
 ## Usage
 
-Run the binary from within an sbt project folder.
+Run the command from within an sbt project folder.
 
 ```shell
-scala-interactive-update
+scala-update
 ```
 
 <img width="832" alt="CleanShot 2022-06-27 at 09 15 23@2x" src="https://user-images.githubusercontent.com/7587245/175950420-9e645dc9-f140-43f2-ad60-1c88198fa8dc.png">
@@ -58,7 +58,7 @@ If a dependency has multiple possible update version—for instance, a new major
 
 I have another library, [zio-tui](https://github.com/kitlangton/zio-tui), for creating interactive command line interactive programs just like this one.
 
-[Badge-SonatypeReleases]: https://img.shields.io/nexus/r/https/oss.sonatype.org/io.github.kitlangton/scala-interactive-update_2.13.svg "Sonatype Releases"
-[Badge-SonatypeSnapshots]: https://img.shields.io/nexus/s/https/oss.sonatype.org/io.github.kitlangton/scala-interactive-update_2.13.svg "Sonatype Snapshots"
-[Link-SonatypeSnapshots]: https://oss.sonatype.org/content/repositories/snapshots/io/github/kitlangton/scala-interactive-update_2.13/ "Sonatype Snapshots"
-[Link-SonatypeReleases]: https://oss.sonatype.org/content/repositories/releases/io/github/kitlangton/scala-interactive-update_2.13/ "Sonatype Releases"
+[Badge-SonatypeReleases]: https://img.shields.io/nexus/r/https/oss.sonatype.org/io.github.kitlangton/scala-update_2.13.svg "Sonatype Releases"
+[Badge-SonatypeSnapshots]: https://img.shields.io/nexus/s/https/oss.sonatype.org/io.github.kitlangton/scala-update_2.13.svg "Sonatype Snapshots"
+[Link-SonatypeSnapshots]: https://oss.sonatype.org/content/repositories/snapshots/io/github/kitlangton/scala-update_2.13/ "Sonatype Snapshots"
+[Link-SonatypeReleases]: https://oss.sonatype.org/content/repositories/releases/io/github/kitlangton/scala-update_2.13/ "Sonatype Releases"

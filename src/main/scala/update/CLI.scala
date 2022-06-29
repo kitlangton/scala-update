@@ -3,9 +3,20 @@ package update
 import tui.TUI
 import update.cli.{CliApp, CliState, DependencyState}
 import view.View
-import zio.{Chunk, IO, NonEmptyChunk, UIO, ZEnvironment, ZIO, ZLayer}
+import zio._
 
 final case class CLI(dependencyUpdater: DependencyUpdater, tui: TUI) {
+
+  /**
+   *   - Get a list of the users current dependencies [[Dependency]]
+   *     - Parse the users build.sbt [[DependencyParser]]
+   *       - Use scala.meta to semantically parse the Scala AST
+   *   - Find the available versions for each dependency [[Versions]]
+   *     - Collect available newer versions across categories (major, minor,
+   *       patch, pre-release) [[UpdateOptions]]
+   *   - Display these options to the user, they select what they want.
+   *   - Replace the versions in the source code.
+   */
 
   val run: IO[Throwable, Unit] = {
     for {
