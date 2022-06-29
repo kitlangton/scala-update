@@ -1,6 +1,5 @@
 # scala-interactive-update
 [![Release Artifacts][Badge-SonatypeReleases]][Link-SonatypeReleases]
-[![Snapshot Artifacts][Badge-SonatypeSnapshots]][Link-SonatypeSnapshots]
 
 Update your Scala dependencies (both libraries and plugins) interactively. [Video Demo](https://twitter.com/kitlangton/status/1541417514823028740).
 
