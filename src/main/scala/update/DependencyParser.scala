@@ -44,6 +44,18 @@ object DependencyParser {
           val location   = versionDef.location
           val dependency = Dependency(group, artifact, versionDef.version)
           builder += DependencyWithLocation(dependency, location)
+        // Matches String Literal Versions: "zio.dev::zio:1.0.0"
+        case MillGroupArtifact(group, artifact, term @ Lit.String(version)) =>
+          val location   = Location(path = source.path, start = term.pos.start, end = term.pos.end)
+          val dependency = Dependency(group, artifact, Version(version))
+          builder += DependencyWithLocation(dependency, location)
+        // Matches Identifier Versions: "zio.dev::zio:$zioVersion"
+        //                              "zio.dev::zio:${V.zio}"
+        case MillGroupArtifact(group, artifact, GetIdentifier(name)) if versionDefs.contains(name) =>
+          val versionDef = versionDefs(name)
+          val location   = versionDef.location
+          val dependency = Dependency(group, artifact, versionDef.version)
+          builder += DependencyWithLocation(dependency, location)
       }
     }
 
@@ -79,6 +91,30 @@ object DependencyParser {
               List(arg)
             ) =>
           Some((Group(group), Artifact(artifact), arg))
+        case _ => None
+      }
+  }
+
+  private object MillGroupArtifact {
+    private val artifact               = raw"([^:]*)::([^:]*)::?(\S)".r
+    private val artifactWithoutVersion = raw"([^:]*)::([^:]*)::?".r
+
+    def unapply(tree: Tree): Option[(Group, Artifact, Term)] =
+      tree match {
+        // Extracts: ivy"group::artifact:$version"
+        case Term.Interpolate(
+              Term.Name("ivy"),
+              Lit.String(artifactWithoutVersion(group, artifact)) :: _,
+              List(arg)
+            ) =>
+          Some((Group(group), Artifact(artifact), arg))
+        // Extracts: ivy"group::artifact:version"
+        case Term.Interpolate(
+              Term.Name("ivy"),
+              Lit.String(artifact(group, artifact, version)) :: _,
+              _
+            ) =>
+          Some((Group(group), Artifact(artifact), Lit.String(version)))
         case _ => None
       }
   }
