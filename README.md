@@ -15,6 +15,26 @@ brew install kitlangton/tap/scala-update
 
 ### Manually with GraalVM
 
+#### Prerequisites
+
+You need GraalVM installed. If you don't have it, you may check their docs [here](https://www.graalvm.org/java/quickstart/). If you're using SDKMAN!, GraalVM images are available to install easily [here](https://sdkman.io/jdks#grl).
+```shell
+# See Java versions and pick a GraalVM version, for example 22.1.0.r17-grl
+sdk list java
+
+sdk install java 22.1.0.r17-grl
+
+# If you haven't set grl version as default, set it for the current terminal session
+sdk use java 22.1.0.r17-grl
+```
+
+You need `native-image` installed. You can install it with GraalVM updater.
+```shell
+gu install native-image
+```
+
+#### Building Native Image with GraalVM
+
 1. Build the native image with `show graalvm-native-image:packageBin`.
 
 ```shell
@@ -22,7 +42,11 @@ sbt 'show graalvm-native-image:packageBin'
 # [info] ~/code/sbt-interactive-update/target/graalvm-native-image/scala-update
 ```
 
-2. Move the generated binary onto your `PATH`.
+2. Move the generated binary onto your `PATH`. For example (in project root directory)
+```shell
+# Might need to run with sudo
+cp target/graalvm-native-image/scala-update /usr/local/bin
+```
 
 ## Usage
 
