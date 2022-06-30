@@ -12,11 +12,12 @@ final case class FilesLive() extends Files {
     val rootPath          = Path(root)
     val projectScalaPaths = FileUtils.allScalaFiles(rootPath / "project")
     val buildSbtPath      = ZStream.succeed(rootPath / "build.sbt")
+    val buildMillPath     = FileUtils.allMillFiles(rootPath)
     val pluginsPath = ZStream
       .succeed(rootPath / "project" / "plugins.sbt")
-      .filterZIO(path => zio.nio.file.Files.exists(path))
 
-    val allSourcePaths = projectScalaPaths ++ buildSbtPath ++ pluginsPath
+    val allSourcePaths = (projectScalaPaths ++ buildSbtPath ++ pluginsPath ++ buildMillPath)
+      .filterZIO(path => zio.nio.file.Files.exists(path))
 
     allSourcePaths.mapZIO { path =>
       ZIO

@@ -28,9 +28,6 @@ case class DependencyUpdater(versions: Versions, files: Files) {
   def allUpdateOptions: IO[Throwable, Chunk[(DependencyWithLocation, UpdateOptions)]] = for {
     pwd <- System.property("user.dir").someOrFailException
 
-    isValidSbtProject <- zio.nio.file.Files.exists(Path(pwd) / "build.sbt")
-    _                 <- ZIO.fail(AppError.MissingBuildSbt).unless(isValidSbtProject)
-
     sourceFiles <- files.allBuildSources(pwd)
     deps         = DependencyParser.getDependencies(sourceFiles)
     updates     <- ZIO.foreachPar(deps)(getUpdateOptions)

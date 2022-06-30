@@ -11,6 +11,15 @@ object FileUtils {
    * Returns a Stream of all Scala
    */
   def allScalaFiles(path: Path): ZStream[Any, IOException, Path] =
+    allFilesWithExt(path, ".scala")
+
+  /**
+   * Returns a Stream of all mill build file (ammonite script)
+   */
+  def allMillFiles(path: Path): ZStream[Any, IOException, Path] =
+    allFilesWithExt(path, ".sc")
+
+  private def allFilesWithExt(path: Path, extension: String): ZStream[Any, IOException, Path] =
     ZStream.whenZIO(Files.isDirectory(path)) {
       Files
         .newDirectoryStream(path)
@@ -21,7 +30,6 @@ object FileUtils {
                    else ZStream.succeed(path)
           } yield res
         }
-        .filter(_.toString.endsWith(".scala"))
+        .filter(_.toString.endsWith(extension))
     }
-
 }
