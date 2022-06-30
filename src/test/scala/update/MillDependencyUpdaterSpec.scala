@@ -32,7 +32,7 @@ import $file.Dependencies, Dependencies.Dependencies
 
 object foo extends ScalaModule {
   def scalaVersion = "2.13.8"
-  val zioVersion = "2.0.1"
+  val zioVersion = "2.0.0"
 
   def ivyDeps = Agg(
     ivy"dev.zio::zio:$zioVersion",
