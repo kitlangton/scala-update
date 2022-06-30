@@ -1,0 +1,27 @@
+on:
+  - pull_request
+
+jobs:
+
+  test:
+    name: test
+    strategy:
+      matrix:
+        os: [macos, ubuntu]
+        include:
+          - os: ubuntu
+            runs: ubuntu-latest
+            artifact-name: sup-linux-amd
+          - os: macos
+            runs: macos-latest
+            artifact-name: sup-macos-amd
+    runs-on: ${{ matrix.runs }}
+
+    steps:
+      - name: checkout
+        uses: actions/checkout@v2
+      - uses: coursier/cache-action@v6
+      - uses: olafurpg/setup-scala@v13
+      - name: test for ${{ matrix.os }}
+        run: |
+          ./sbt test
