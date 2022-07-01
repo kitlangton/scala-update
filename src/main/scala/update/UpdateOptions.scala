@@ -24,7 +24,7 @@ object UpdateOptions {
     val patch = current.patch
 
     val allNewerVersions =
-      available.filter(_.isNewerThan(current))
+      available.filter(_.isNewerThan(current)).sorted
     val majorVersion =
       allNewerVersions
         .filter(v => ((current.preRelease.isDefined && v.major == major) || v.major > major) && v.preRelease.isEmpty)

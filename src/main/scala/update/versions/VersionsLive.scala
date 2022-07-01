@@ -38,7 +38,7 @@ final case class VersionsLive() extends Versions {
       .map(_.left.map(new Error(_)))
       .absolve
       .map { case (versions, _) =>
-        versions.available.map(Version)
+        versions.available.map(Version(_))
       }
       .catchSome {
         case e if e.getMessage.contains("not found") =>
