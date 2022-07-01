@@ -115,7 +115,7 @@ object Doc {
 
 final case class Search() {
 
-  def search(query: String): ZIO[Any, Throwable, List[SearchResult]] = {
+  def search(query: String): Task[List[SearchResult]] = {
     val urlEncodedQuery = URLEncoder.encode(query, "UTF-8")
     val url             = s"https://search.maven.org/solrsearch/select?q=$urlEncodedQuery&start=0&rows=60"
     for {
@@ -131,14 +131,14 @@ final case class Search() {
       .distinctBy(sr => (sr.group, sr.artifact, sr.latestVersion))
   }
 
-  def searchCLI(query: String): Task[List[SearchResult]] =
+  def searchCLI(query: String): Task[Unit] =
     for {
       results <- search(query)
       _ <- ZIO.debug(
              View
                .vertical(
                  Chunk(
-                   View.text("LATEST PACKAGES").blue,
+                   View.horizontal(View.text("MAVEN PACKAGES FOR").blue, View.text(query).blue.underlined),
                    View.text("───────────────").blue.dim
                  ) ++
                    results.map(_.render): _*
@@ -146,7 +146,7 @@ final case class Search() {
                .padding(1)
                .renderNow
            )
-    } yield results
+    } yield ()
 
 }
 

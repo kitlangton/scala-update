@@ -32,7 +32,7 @@ final case class VersionsLive() extends Versions {
           Map("scalaVersion" -> scalaVersion) ++ sbtVersion.map("sbtVersion" -> _)
         ),
         cache.fetch,
-        true
+        versionsCheckHasModule = true
       )
       .run
       .map(_.left.map(new Error(_)))
@@ -46,12 +46,3 @@ final case class VersionsLive() extends Versions {
       }
 
 }
-
-//object VersionsDemo extends ZIOAppDefault {
-//  val run = {
-//    for {
-//      _ <- VersionsLive().getVersions(Group("dev.zio"), Artifact("zio-json")).debug("Library Versions")
-//      _ <- VersionsLive().getVersions(Group("com.github.sbt"), Artifact("sbt-native-packager")).debug("Plugin Versions")
-//    } yield ()
-//  }
-//}
