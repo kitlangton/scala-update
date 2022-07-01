@@ -1,7 +1,5 @@
 package update.search
 
-import tui.TUI
-import tui.components.Choose
 import update.{Artifact, Group, Version}
 import view.View
 import zio._
@@ -48,11 +46,11 @@ final case class SearchResult(
 ) {
   def render: View =
     View.horizontal(
-      View.text(s"\"${group.value}\"").blue,
-      View.text("%%").blue.dim,
-      View.text(s"\"${artifact.value}\"").blue,
-      View.text("%").blue.dim,
-      View.text(s"\"${latestVersion.value}\"").blue
+      View.text(s"\"${group.value}\"").cyan,
+      View.text("%%").cyan.dim,
+      View.text(s"\"${artifact.value}\"").cyan,
+      View.text("%").cyan.dim,
+      View.text(s"\"${latestVersion.value}\"").cyan
     )
 }
 
@@ -133,16 +131,9 @@ final case class Search() {
       .distinctBy(sr => (sr.group, sr.artifact, sr.latestVersion))
   }
 
-}
-
-object SearchExample extends ZIOAppDefault {
-
-  val run: ZIO[Any with ZIOAppArgs with Scope, Any, Any] = {
+  def searchCLI(query: String): Task[List[SearchResult]] =
     for {
-      _       <- ZIO.unit
-      search   = Search()
-      results <- search.search("zio-cli")
-//      _       <- Choose.run(results)(_.render)
+      results <- search(query)
       _ <- ZIO.debug(
              View
                .vertical(
@@ -152,9 +143,16 @@ object SearchExample extends ZIOAppDefault {
                  ) ++
                    results.map(_.render): _*
                )
-               .render(100, 10)
+               .padding(1)
+               .renderNow
            )
     } yield results
-  }.provide(TUI.live(false))
+
+}
+
+object SearchExample extends ZIOAppDefault {
+
+  val run: ZIO[Any with ZIOAppArgs with Scope, Any, Any] =
+    Search().searchCLI("Hello")
 
 }
