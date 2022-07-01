@@ -20,21 +20,23 @@ inThisBuild(
   )
 )
 
-val zioVersion       = "2.0.0"
-val zioNioVersion    = "2.0.0"
 val coursierVersion  = "2.1.0-M6-28-gbad85693f"
-val zioTuiVersion    = "0.1.7"
 val scalaMetaVersion = "4.5.9"
+val zioCliVersion    = "0.2.7"
+val zioJsonVersion   = "0.3.0-RC9"
+val zioNioVersion    = "2.0.0"
+val zioTuiVersion    = "0.1.7"
+val zioVersion       = "2.0.0"
 
 lazy val root = (project in file("."))
   .settings(
     name := "scala-update",
     libraryDependencies ++= Seq(
       "dev.zio"              %% "zio"               % zioVersion,
-      "dev.zio"              %% "zio-cli"           % "0.2.7",
+      "dev.zio"              %% "zio-cli"           % zioCliVersion,
       "dev.zio"              %% "zio-macros"        % zioVersion,
       "dev.zio"              %% "zio-nio"           % zioNioVersion,
-      "dev.zio"              %% "zio-json"          % "0.3.0-RC9",
+      "dev.zio"              %% "zio-json"          % zioJsonVersion,
       "dev.zio"              %% "zio-streams"       % zioVersion,
       "dev.zio"              %% "zio-test"          % zioVersion % Test,
       "dev.zio"              %% "zio-test-magnolia" % zioVersion % Test,
