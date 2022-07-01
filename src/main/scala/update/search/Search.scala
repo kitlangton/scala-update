@@ -139,7 +139,7 @@ final case class Search() {
                .vertical(
                  Chunk(
                    View.horizontal(View.text("MAVEN PACKAGES FOR").blue, View.text(query).blue.underlined),
-                   View.text("───────────────").blue.dim
+                   View.text("─" * s"MAVEN PACKAGES FOR $query".length).blue.dim
                  ) ++
                    results.map(_.render): _*
                )
@@ -147,12 +147,5 @@ final case class Search() {
                .renderNow
            )
     } yield ()
-
-}
-
-object SearchExample extends ZIOAppDefault {
-
-  val run: ZIO[Any with ZIOAppArgs with Scope, Any, Any] =
-    Search().searchCLI("Hello")
 
 }
