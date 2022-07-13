@@ -30,7 +30,11 @@ case class DependencyUpdater(versions: Versions, files: Files) {
 
     sourceFiles <- files.allBuildSources(pwd)
     deps         = DependencyParser.getDependencies(sourceFiles)
-    updates     <- ZIO.foreachPar(deps)(getUpdateOptions)
+    sbtVersion =
+      deps
+        .find(dwl => dwl.dependency.group == Dependency.sbtGroup && dwl.dependency.artifact == Dependency.sbtArtifact)
+        .map(_.dependency.version)
+    updates <- ZIO.foreachPar(deps)(dep => getUpdateOptions(dep, sbtVersion))
   } yield updates
 
   private def groupUpdatesByFile(
@@ -53,10 +57,11 @@ case class DependencyUpdater(versions: Versions, files: Files) {
     }
 
   private def getUpdateOptions(
-    dep: DependencyWithLocation
+    dep: DependencyWithLocation,
+    sbtVersion: Option[Version]
   ): IO[Throwable, (DependencyWithLocation, UpdateOptions)] =
     versions
-      .getVersions(dep.dependency.group, dep.dependency.artifact)
+      .getVersions(dep.dependency.group, dep.dependency.artifact, sbtVersion)
       .map { allVersions =>
         dep -> UpdateOptions.getOptions(dep.dependency.version, allVersions)
       }

@@ -18,44 +18,55 @@ final case class VersionWithLocation(
 
 final case class Location(path: Path, start: Int, end: Int)
 
-final case class SourceFile(path: Path, string: String) {
+final case class SourceFile(path: Path, string: String, extension: Option[String]) {
   import scala.meta._
-  val tree: Tree = dialects.Sbt1(string).parse[Source].get
+  lazy val tree: Tree = dialects.Sbt1(string).parse[Source].get
 }
 
 object DependencyParser {
+  private val sbtVersionLabel = "sbt.version"
+  private val sbtVersionRegex = "sbt\\.version\\s*=\\s*\"?(.+)\"?".r
 
   def getDependencies(sources: Chunk[SourceFile]): Chunk[DependencyWithLocation] = {
     val versionDefs = parseVersionDefs(sources)
     val builder     = ChunkBuilder.make[DependencyWithLocation]()
 
     sources.foreach { source =>
-      source.tree.traverse {
-        // Matches String Literal Versions: "zio.dev" %% "zio" % "1.0.0"
-        case GroupAndArtifact(group, artifact, term @ Lit.String(version)) =>
-          val location   = Location(path = source.path, start = term.pos.start, end = term.pos.end)
-          val dependency = Dependency(group, artifact, Version(version))
-          builder += DependencyWithLocation(dependency, location)
+      if (source.extension.contains("properties")) {
+        source.string match {
+          case sbtVersionRegex(version) =>
+            val dependency = Dependency.sbt(version)
+            val location   = Location(source.path, 0, s"$sbtVersionLabel = $version".length)
+            builder += DependencyWithLocation(dependency, location)
+        }
+      } else {
+        source.tree.traverse {
+          // Matches String Literal Versions: "zio.dev" %% "zio" % "1.0.0"
+          case GroupAndArtifact(group, artifact, term @ Lit.String(version)) =>
+            val location   = Location(path = source.path, start = term.pos.start, end = term.pos.end)
+            val dependency = Dependency(group, artifact, Version(version))
+            builder += DependencyWithLocation(dependency, location)
 
-        // Matches Identifier Versions: "zio.dev" %% "zio" % zioVersion
-        //                              "zio.dev" %% "zio" % V.zio
-        case GroupAndArtifact(group, artifact, GetIdentifier(name)) if versionDefs.contains(name) =>
-          val versionDef = versionDefs(name)
-          val location   = versionDef.location
-          val dependency = Dependency(group, artifact, versionDef.version)
-          builder += DependencyWithLocation(dependency, location)
-        // Matches String Literal Versions: "zio.dev::zio:1.0.0"
-        case MillGroupArtifact(group, artifact, term @ Lit.String(version)) =>
-          val location   = Location(path = source.path, start = term.pos.start, end = term.pos.end)
-          val dependency = Dependency(group, artifact, Version(version))
-          builder += DependencyWithLocation(dependency, location)
-        // Matches Identifier Versions: "zio.dev::zio:$zioVersion"
-        //                              "zio.dev::zio:${V.zio}"
-        case MillGroupArtifact(group, artifact, GetIdentifier(name)) if versionDefs.contains(name) =>
-          val versionDef = versionDefs(name)
-          val location   = versionDef.location
-          val dependency = Dependency(group, artifact, versionDef.version)
-          builder += DependencyWithLocation(dependency, location)
+          // Matches Identifier Versions: "zio.dev" %% "zio" % zioVersion
+          //                              "zio.dev" %% "zio" % V.zio
+          case GroupAndArtifact(group, artifact, GetIdentifier(name)) if versionDefs.contains(name) =>
+            val versionDef = versionDefs(name)
+            val location   = versionDef.location
+            val dependency = Dependency(group, artifact, versionDef.version)
+            builder += DependencyWithLocation(dependency, location)
+          // Matches String Literal Versions: "zio.dev::zio:1.0.0"
+          case MillGroupArtifact(group, artifact, term @ Lit.String(version)) =>
+            val location   = Location(path = source.path, start = term.pos.start, end = term.pos.end)
+            val dependency = Dependency(group, artifact, Version(version))
+            builder += DependencyWithLocation(dependency, location)
+          // Matches Identifier Versions: "zio.dev::zio:$zioVersion"
+          //                              "zio.dev::zio:${V.zio}"
+          case MillGroupArtifact(group, artifact, GetIdentifier(name)) if versionDefs.contains(name) =>
+            val versionDef = versionDefs(name)
+            val location   = versionDef.location
+            val dependency = Dependency(group, artifact, versionDef.version)
+            builder += DependencyWithLocation(dependency, location)
+        }
       }
     }
 
@@ -69,11 +80,20 @@ object DependencyParser {
 
   private[update] def parseVersionDefs(sourceFile: SourceFile): Map[String, VersionWithLocation] = {
     val mutableMap = mutable.Map.empty[String, VersionWithLocation]
-    sourceFile.tree.traverse { //
-      case q"""val $identifier = ${term @ Lit.String(versionString)}""" =>
-        val versionWithLocation =
-          VersionWithLocation(Version(versionString), Location(sourceFile.path, term.pos.start, term.pos.end))
-        mutableMap += (identifier.syntax -> versionWithLocation)
+    sourceFile.extension match {
+      case Some("properties") =>
+        sourceFile.string match {
+          case sbtVersionRegex(version) =>
+            val location = Location(sourceFile.path, 0, s"$sbtVersionLabel = $version".length)
+            mutableMap += (sbtVersionLabel -> VersionWithLocation(Version(version), location))
+        }
+      case _ =>
+        sourceFile.tree.traverse { //
+          case q"""val $identifier = ${term @ Lit.String(versionString)}""" =>
+            val versionWithLocation =
+              VersionWithLocation(Version(versionString), Location(sourceFile.path, term.pos.start, term.pos.end))
+            mutableMap += (identifier.syntax -> versionWithLocation)
+        }
     }
     mutableMap.toMap
   }

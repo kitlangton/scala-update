@@ -10,12 +10,12 @@ final case class VersionsLive() extends Versions {
   private val cache = FileCache[Task]()
 
   // Currently hardcoded to Maven Central and scala 2.13
-  override def getVersions(group: Group, artifact: Artifact): Task[List[Version]] =
+  override def getVersions(group: Group, artifact: Artifact, sbtVersion: Option[Version]): Task[List[Version]] =
     // Gets library versions from Maven Central
     getVersions(group, artifact, "2.13", None)
       .filterOrElse(_.nonEmpty) {
         // Gets plugin versions from Maven Central
-        getVersions(group, artifact, "2.12", Some("1.0"))
+        getVersions(group, artifact, "2.12", sbtVersion.map(_.value))
       }
 
   private def getVersions(

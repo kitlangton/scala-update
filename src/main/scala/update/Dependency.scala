@@ -60,6 +60,11 @@ final case class Dependency(group: Group, artifact: Artifact, version: Version)
 object Dependency {
   implicit val dependencyOrder: Ordering[Dependency] =
     Ordering.by(d => (d.group.value, d.artifact.value, d.version.value))
+
+  val sbtGroup: Group       = Group("org.scala-sbt")
+  val sbtArtifact: Artifact = Artifact("sbt")
+
+  def sbt(version: String): Dependency = Dependency(sbtGroup, sbtArtifact, Version(version))
 }
 
 object VersionDetails {

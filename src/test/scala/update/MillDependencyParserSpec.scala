@@ -32,7 +32,8 @@ object foo extends ScalaModule {
   )
 }
 
-"""
+""",
+              None
             )
           )
 
@@ -65,7 +66,8 @@ object foo extends ScalaModule {
   )
 }
 
-"""
+""",
+              None
             ),
             SourceFile(
               Path("Versions.sc"),
@@ -77,7 +79,8 @@ object V {
   val `zio-json` = "0.3.0"
   val zioTest = "1.0.14"
 }
-"""
+""",
+              Some("sc")
             )
           )
 
