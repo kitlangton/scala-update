@@ -19,6 +19,12 @@ object FileUtils {
   def allMillFiles(path: Path): ZStream[Any, IOException, Path] =
     allFilesWithExt(path, ".sc")
 
+  /**
+   * Returns file extension of given path, if it exists
+   */
+  def extension(path: Path): Option[String] =
+    path.filename.toString().split('.').lastOption
+
   private def allFilesWithExt(path: Path, extension: String): ZStream[Any, IOException, Path] =
     ZStream.whenZIO(Files.isDirectory(path)) {
       Files

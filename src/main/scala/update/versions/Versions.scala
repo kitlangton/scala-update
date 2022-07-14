@@ -4,19 +4,23 @@ import update.{Artifact, Dependency, Group, Version}
 import zio._
 
 trait Versions {
-  def getVersions(group: Group, artifact: Artifact): Task[List[Version]]
+  def getVersions(group: Group, artifact: Artifact, sbtVersion: Option[Version]): Task[List[Version]]
 
-  def getVersions(dependency: Dependency): Task[List[Version]] =
-    getVersions(dependency.group, dependency.artifact)
+  def getVersions(dependency: Dependency, sbtVersion: Option[Version]): Task[List[Version]] =
+    getVersions(dependency.group, dependency.artifact, sbtVersion)
 }
 
 object Versions {
 
-  def getVersions(group: Group, artifact: Artifact): ZIO[Versions, Throwable, List[Version]] =
-    ZIO.serviceWithZIO[Versions](_.getVersions(group, artifact))
+  def getVersions(
+    group: Group,
+    artifact: Artifact,
+    sbtVersion: Option[Version]
+  ): ZIO[Versions, Throwable, List[Version]] =
+    ZIO.serviceWithZIO[Versions](_.getVersions(group, artifact, sbtVersion))
 
-  def getVersions(dependency: Dependency): ZIO[Versions, Throwable, List[Version]] =
-    ZIO.serviceWithZIO[Versions](_.getVersions(dependency))
+  def getVersions(dependency: Dependency, sbtVersion: Option[Version]): ZIO[Versions, Throwable, List[Version]] =
+    ZIO.serviceWithZIO[Versions](_.getVersions(dependency, sbtVersion))
 
   val live: ULayer[Versions] =
     ZLayer.fromFunction(VersionsLive.apply _)
@@ -28,6 +32,6 @@ object Versions {
 }
 
 final case class VersionsFake(versions: Map[(Group, Artifact), List[Version]]) extends Versions {
-  override def getVersions(group: Group, artifact: Artifact): Task[List[Version]] =
+  override def getVersions(group: Group, artifact: Artifact, sbtVersion: Option[Version]): Task[List[Version]] =
     ZIO.succeed(versions.getOrElse((group, artifact), Nil))
 }

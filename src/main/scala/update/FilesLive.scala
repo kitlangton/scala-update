@@ -15,15 +15,16 @@ final case class FilesLive() extends Files {
     val buildMillPath     = FileUtils.allMillFiles(rootPath)
     val pluginsPath = ZStream
       .succeed(rootPath / "project" / "plugins.sbt")
+    val sbtPropertiesFilePath = ZStream.succeed(rootPath / "project" / "build.properties")
 
-    val allSourcePaths = (projectScalaPaths ++ buildSbtPath ++ pluginsPath ++ buildMillPath)
+    val allSourcePaths = (projectScalaPaths ++ buildSbtPath ++ pluginsPath ++ buildMillPath ++ sbtPropertiesFilePath)
       .filterZIO(path => zio.nio.file.Files.exists(path))
 
     allSourcePaths.mapZIO { path =>
       ZIO
         .readFile(path.toString)
         .map { content =>
-          SourceFile(path, content)
+          SourceFile(path, content, FileUtils.extension(path))
         }
     }.runCollect
   }

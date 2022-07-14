@@ -25,7 +25,8 @@ libraryDependencies ++= Seq(
   "dev.zio" %%% "zio-test" % V.zioTest % Test,
   "dev.zio" % "zio-json" % V.`zio-json`
 )
-"""
+""",
+              None
             ),
             SourceFile(
               Path("fake"),
@@ -38,7 +39,8 @@ libraryDependencies ++= Seq(
   "other.dev" % "other" % V.other,
   "other.dev" %%% "other.test" % "3.5.8" % Test
 )
-"""
+""",
+              None
             )
           )
 

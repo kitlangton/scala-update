@@ -30,22 +30,24 @@ case class DependencyUpdater(versions: Versions, files: Files) {
 
     sourceFiles <- files.allBuildSources(pwd)
     deps         = DependencyParser.getDependencies(sourceFiles)
-    updates     <- ZIO.foreachPar(deps)(getUpdateOptions)
+    sbtVersion   = deps.collectFirst { case DependencyWithLocation(dep, _) if dep.isSbt => dep.version }
+    updates     <- ZIO.foreachPar(deps)(dep => getUpdateOptions(dep, sbtVersion))
   } yield updates
 
   private def groupUpdatesByFile(
     updates: Chunk[(DependencyWithLocation, Version)]
   ): Map[Path, Chunk[VersionWithLocation]] =
     updates.groupMap(_._1.location.path) { case (dep, version) =>
-      VersionWithLocation(version, dep.location)
+      VersionWithLocation(version, dep.location, quote = !dep.dependency.isSbt)
     }
 
   private def updateFile(path: Path, updates: Chunk[VersionWithLocation]): IO[IOException, Unit] =
     ZIO.scoped {
       for {
         oldContent <- ZIO.readFile(path.toString)
-        replacements = updates.map { case VersionWithLocation(version, location) =>
-                         Replacement(location.start, location.end, "\"" + version.value + "\"")
+        replacements = updates.map { case VersionWithLocation(version, location, shouldQuote) =>
+                         val quote = if (shouldQuote) "\"" else ""
+                         Replacement(location.start, location.end, s"$quote${version.value}$quote")
                        }
         newContent = Replacement.replace(oldContent, replacements.toList)
         _         <- ZIO.writeFile(path.toString, newContent)
@@ -53,10 +55,11 @@ case class DependencyUpdater(versions: Versions, files: Files) {
     }
 
   private def getUpdateOptions(
-    dep: DependencyWithLocation
+    dep: DependencyWithLocation,
+    sbtVersion: Option[Version]
   ): IO[Throwable, (DependencyWithLocation, UpdateOptions)] =
     versions
-      .getVersions(dep.dependency.group, dep.dependency.artifact)
+      .getVersions(dep.dependency.group, dep.dependency.artifact, sbtVersion)
       .map { allVersions =>
         dep -> UpdateOptions.getOptions(dep.dependency.version, allVersions)
       }
