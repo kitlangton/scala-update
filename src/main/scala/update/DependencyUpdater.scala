@@ -30,7 +30,7 @@ case class DependencyUpdater(versions: Versions, files: Files) {
 
     sourceFiles <- files.allBuildSources(pwd)
     deps         = DependencyParser.getDependencies(sourceFiles)
-    sbtVersion   = deps.find(_.dependency.isSbt).map(_.dependency.version)
+    sbtVersion   = deps.collectFirst { case DependencyWithLocation(dep, _) if dep.isSbt => dep.version }
     updates     <- ZIO.foreachPar(deps)(dep => getUpdateOptions(dep, sbtVersion))
   } yield updates
 

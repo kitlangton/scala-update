@@ -27,22 +27,17 @@ final case class SourceFile(path: Path, string: String, extension: Option[String
 }
 
 object DependencyParser {
-  private val sbtVersionLabel = "sbt.version"
-  private val sbtVersionRegex = "sbt\\.version\\s*=\\s*\"?(.+)\"?".r
-
   def getDependencies(sources: Chunk[SourceFile]): Chunk[DependencyWithLocation] = {
     val versionDefs = parseVersionDefs(sources)
     val builder     = ChunkBuilder.make[DependencyWithLocation]()
 
-    sources.foreach { source =>
-      if (source.isPropertiesFile) {
-        source.string match {
-          case SbtVersion(version, start) =>
-            val dependency = Dependency.sbt(version.value)
-            val location   = Location(source.path, start, source.string.length)
-            builder += DependencyWithLocation(dependency, location)
-        }
-      } else {
+    sources.foreach {
+      case source @ SbtVersionFile(version, start) =>
+        val dependency = Dependency.sbt(version.value)
+        val location   = Location(source.path, start, source.string.length)
+        builder += DependencyWithLocation(dependency, location)
+
+      case source =>
         source.tree.traverse {
           // Matches String Literal Versions: "zio.dev" %% "zio" % "1.0.0"
           case GroupAndArtifact(group, artifact, term @ Lit.String(version)) =>
@@ -70,7 +65,6 @@ object DependencyParser {
             val dependency = Dependency(group, artifact, versionDef.version)
             builder += DependencyWithLocation(dependency, location)
         }
-      }
     }
 
     builder.result()
@@ -83,19 +77,18 @@ object DependencyParser {
 
   private[update] def parseVersionDefs(sourceFile: SourceFile): Map[String, VersionWithLocation] = {
     val mutableMap = mutable.Map.empty[String, VersionWithLocation]
-    if (sourceFile.isPropertiesFile) {
-      sourceFile.string match {
-        case SbtVersion(version, start) =>
-          val location = Location(sourceFile.path, start, sourceFile.string.length)
-          mutableMap += (sbtVersionLabel -> VersionWithLocation(version, location))
-      }
-    } else {
-      sourceFile.tree.traverse { //
-        case q"""val $identifier = ${term @ Lit.String(versionString)}""" =>
-          val versionWithLocation =
-            VersionWithLocation(Version(versionString), Location(sourceFile.path, term.pos.start, term.pos.end))
-          mutableMap += (identifier.syntax -> versionWithLocation)
-      }
+    sourceFile match {
+      case s if s.isPropertiesFile =>
+      // No need to parse properties file for version definition values as this is most probably
+      // sbt version file and it only contains sbt version definition in a specific format.
+
+      case _ =>
+        sourceFile.tree.traverse { //
+          case q"""val $identifier = ${term @ Lit.String(versionString)}""" =>
+            val versionWithLocation =
+              VersionWithLocation(Version(versionString), Location(sourceFile.path, term.pos.start, term.pos.end))
+            mutableMap += (identifier.syntax -> versionWithLocation)
+        }
     }
     mutableMap.toMap
   }
@@ -154,11 +147,20 @@ object DependencyParser {
       }
   }
 
-  private object SbtVersion {
-    def unapply(string: String): Option[(Version, Int)] =
-      string match {
-        case sbtVersionRegex(version) => Some((Version(version), string.indexOf(version)))
-        case _                        => None
+  private object SbtVersionFile {
+    def unapply(sourceFile: SourceFile): Option[(Version, Int)] =
+      if (sourceFile.isPropertiesFile) {
+        val parts = sourceFile.string.split("=").map(_.trim)
+        parts.headOption match {
+          case Some(label) if label == "sbt.version" =>
+            parts.drop(1).headOption.map { version =>
+              Version(version) -> sourceFile.string.indexOf(version)
+            }
+
+          case _ => None
+        }
+      } else {
+        None
       }
   }
 }

@@ -1,12 +1,13 @@
 package update
 
+import zio.Chunk
 import zio.nio.file.Path
 import zio.test._
 
 object ReplacementSpec extends ZIOSpecDefault {
   def spec =
     suite("ReplacementSpec")(
-      test("replace updated versions parsed from build definition") {
+      test("replace updated versions parsed from build definition with version definitions") {
         val parsed =
           SourceFile(
             Path("fake"),
@@ -42,6 +43,42 @@ object V {
 
         assertTrue(result == expected)
       },
+      test("replace updated versions parsed from build definition with inline versions") {
+        val parsed =
+          SourceFile(
+            Path("build.sbt"),
+            """
+libraryDependencies ++= Seq(
+  "dev.zio" %% "zio"       % "1.0.14",
+  "dev.zio" %% "zio-test"  % "0.1.0",
+  "dev.zio" %% "zio-spike" % "0.1.0",
+  "dev.zio" %% "zio-json"  % "0.1.0"
+)
+""",
+            Some("sbt")
+          )
+
+        val assignments = DependencyParser.getDependencies(Chunk.succeed(parsed)).toList
+
+        val result = Replacement.replace(
+          parsed.string,
+          assignments.toList.map(v =>
+            Replacement(v.location.start, v.location.end, "\"" + v.dependency.version.value + "-RC10" + "\"")
+          )
+        )
+
+        val expected =
+          """
+libraryDependencies ++= Seq(
+  "dev.zio" %% "zio"       % "1.0.14-RC10",
+  "dev.zio" %% "zio-test"  % "0.1.0-RC10",
+  "dev.zio" %% "zio-spike" % "0.1.0-RC10",
+  "dev.zio" %% "zio-json"  % "0.1.0-RC10"
+)
+"""
+
+        assertTrue(result == expected)
+      },
       test("replace updated sbt version parsed from build.properties file") {
         val parsed =
           SourceFile(
@@ -50,11 +87,11 @@ object V {
             Some("properties")
           )
 
-        val assignments = DependencyParser.parseVersionDefs(parsed)
+        val assignments = DependencyParser.getDependencies(Chunk.succeed(parsed)).toList
 
         val result = Replacement.replace(
           parsed.string,
-          assignments.values.toList.map(v => Replacement(v.location.start, v.location.end, s"${v.version.value}-RC10"))
+          assignments.map(v => Replacement(v.location.start, v.location.end, s"${v.dependency.version.value}-RC10"))
         )
 
         val expected = """sbt.version = 1.2.3-RC10"""
