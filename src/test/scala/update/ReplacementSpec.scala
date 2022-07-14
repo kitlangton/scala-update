@@ -54,10 +54,10 @@ object V {
 
         val result = Replacement.replace(
           parsed.string,
-          assignments.values.toList.map(v => Replacement(v.location.start, v.location.end, v.version.value + "-RC10"))
+          assignments.values.toList.map(v => Replacement(v.location.start, v.location.end, s"${v.version.value}-RC10"))
         )
 
-        val expected = """1.2.3-RC10"""
+        val expected = """sbt.version = 1.2.3-RC10"""
 
         assertTrue(result == expected)
       }

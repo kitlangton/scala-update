@@ -3,7 +3,7 @@ package update.versions
 import coursier.cache.FileCache
 import coursier.{Module, ModuleName, Organization, Resolve}
 import update.versions.ZioSyncInstance._
-import update.{Artifact, Group, Version}
+import update.{Artifact, Dependency, Group, Version}
 import zio._
 
 final case class VersionsLive() extends Versions {
@@ -24,19 +24,27 @@ final case class VersionsLive() extends Versions {
     artifact: Artifact,
     scalaVersion: String,
     sbtVersion: Option[String]
-  ): Task[List[Version]] =
+  ): Task[List[Version]] = {
+    val isSbt = Dependency.isSbt(group, artifact)
+
     resolve.finalRepositories.flatMap { repositories =>
       ZIO
         .foreachPar(repositories) { repository =>
+          val attributes =
+            if (isSbt)
+              Map.empty[String, String]
+            else
+              Map("scalaVersion" -> scalaVersion) ++ sbtVersion.map("sbtVersion" -> _)
+
           repository
             .versions(
               Module(
                 Organization(group.value),
                 ModuleName(artifact.value),
-                Map("scalaVersion" -> scalaVersion) ++ sbtVersion.map("sbtVersion" -> _)
+                attributes
               ),
               cache.fetch,
-              versionsCheckHasModule = true
+              versionsCheckHasModule = !isSbt
             )
             .run
             .map(_.left.map(new Error(_)))
@@ -51,4 +59,5 @@ final case class VersionsLive() extends Versions {
         }
         .map(_.flatten.toList)
     }
+  }
 }

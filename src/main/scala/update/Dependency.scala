@@ -55,7 +55,9 @@ object Version {
 }
 
 // group %% artifact % version
-final case class Dependency(group: Group, artifact: Artifact, version: Version)
+final case class Dependency(group: Group, artifact: Artifact, version: Version) {
+  val isSbt: Boolean = Dependency.isSbt(group, artifact)
+}
 
 object Dependency {
   implicit val dependencyOrder: Ordering[Dependency] =
@@ -65,6 +67,8 @@ object Dependency {
   val sbtArtifact: Artifact = Artifact("sbt")
 
   def sbt(version: String): Dependency = Dependency(sbtGroup, sbtArtifact, Version(version))
+
+  def isSbt(group: Group, artifact: Artifact): Boolean = group == sbtGroup && artifact == sbtArtifact
 }
 
 object VersionDetails {
