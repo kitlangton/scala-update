@@ -25,7 +25,7 @@ val scalaMetaVersion = "4.5.9"
 val zioCliVersion    = "0.2.7"
 val zioJsonVersion   = "0.3.0-RC9"
 val zioNioVersion    = "2.0.0"
-val zioTuiVersion    = "0.1.7"
+val zioTuiVersion    = "0.1.9"
 val zioVersion       = "2.0.0"
 
 lazy val root = (project in file("."))
