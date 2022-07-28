@@ -2,7 +2,7 @@ package update
 
 import tui.TUI
 import update.versions.Versions
-import view.{VerticalAlignment, View}
+import tui.view.{VerticalAlignment, View}
 import zio._
 
 sealed trait Subcommand extends Product with Serializable

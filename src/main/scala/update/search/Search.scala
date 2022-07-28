@@ -1,7 +1,7 @@
 package update.search
 
 import update.{Artifact, Group, Version}
-import view.View
+import tui.view.View
 import zio._
 import zio.json._
 

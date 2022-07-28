@@ -2,7 +2,7 @@ package update
 
 import tui.TUI
 import update.cli.{CliApp, CliState, DependencyState}
-import view.View
+import tui.view.View
 import zio._
 
 final case class CLI(dependencyUpdater: DependencyUpdater, tui: TUI) {
