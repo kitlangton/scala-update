@@ -80,7 +80,7 @@ If a dependency has multiple possible update version—for instance, a new major
 
 ### How did you make the interactive CLI?
 
-I have another library, [zio-tui](https://github.com/kitlangton/zio-tui), for creating interactive command line interactive programs just like this one.
+I have another library, [zio-tui](https://github.com/kitlangton/zio-tui), for creating interactive command line programs just like this one.
 
 [Badge-SonatypeReleases]: https://img.shields.io/nexus/r/https/oss.sonatype.org/io.github.kitlangton/scala-update_2.13.svg "Sonatype Releases"
 [Badge-SonatypeSnapshots]: https://img.shields.io/nexus/s/https/oss.sonatype.org/io.github.kitlangton/scala-update_2.13.svg "Sonatype Snapshots"
