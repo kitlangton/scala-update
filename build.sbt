@@ -21,12 +21,12 @@ inThisBuild(
 )
 
 val coursierVersion  = "2.1.0-M6-28-gbad85693f"
-val scalaMetaVersion = "4.5.9"
+val scalaMetaVersion = "4.5.13"
 val zioCliVersion    = "0.2.7"
-val zioJsonVersion   = "0.3.0-RC9"
+val zioJsonVersion   = "0.3.0-RC11"
 val zioNioVersion    = "2.0.0"
 val zioTuiVersion    = "0.1.9"
-val zioVersion       = "2.0.0"
+val zioVersion       = "2.0.2"
 
 lazy val root = (project in file("."))
   .settings(
