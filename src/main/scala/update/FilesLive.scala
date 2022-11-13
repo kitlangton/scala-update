@@ -6,15 +6,18 @@ import zio.{Chunk, IO, ZIO}
 
 import java.io.IOException
 
-final case class FilesLive() extends Files {
+case object FilesLive extends Files {
 
   override def allBuildSources(root: String): IO[IOException, Chunk[SourceFile]] = {
-    val rootPath          = Path(root)
+    val rootPath = Path(root)
+
+    // Scala files
     val projectScalaPaths = FileUtils.allScalaFiles(rootPath / "project")
-    val buildSbtPath      = ZStream.succeed(rootPath / "build.sbt")
     val buildMillPath     = FileUtils.allMillFiles(rootPath)
-    val pluginsPath = ZStream
-      .succeed(rootPath / "project" / "plugins.sbt")
+    // .sbt files
+    val buildSbtPath      = ZStream.succeed(rootPath / "build.sbt")
+    val pluginsPath       = ZStream.succeed(rootPath / "project" / "plugins.sbt")
+    // A .properties file
     val sbtPropertiesFilePath = ZStream.succeed(rootPath / "project" / "build.properties")
 
     val allSourcePaths = (projectScalaPaths ++ buildSbtPath ++ pluginsPath ++ buildMillPath ++ sbtPropertiesFilePath)

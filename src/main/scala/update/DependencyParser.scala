@@ -19,9 +19,9 @@ final case class VersionWithLocation(
 
 final case class Location(path: Path, start: Int, end: Int)
 
-final case class SourceFile(path: Path, string: String, extension: Option[String]) {
+final case class SourceFile(path: Path, content: String, extension: Option[String]) {
   import scala.meta._
-  lazy val tree: Tree = dialects.Sbt1(string).parse[Source].get
+  lazy val tree: Tree = dialects.Sbt1(content).parse[Source].get
 
   val isPropertiesFile: Boolean = extension.contains("properties")
 }
@@ -34,7 +34,7 @@ object DependencyParser {
     sources.foreach {
       case source @ SbtVersionFile(version, start) =>
         val dependency = Dependency.sbt(version.value)
-        val location   = Location(source.path, start, source.string.length)
+        val location   = Location(source.path, start, source.content.length)
         builder += DependencyWithLocation(dependency, location)
 
       case source =>
@@ -150,11 +150,11 @@ object DependencyParser {
   private object SbtVersionFile {
     def unapply(sourceFile: SourceFile): Option[(Version, Int)] =
       if (sourceFile.isPropertiesFile) {
-        val parts = sourceFile.string.split("=").map(_.trim)
+        val parts = sourceFile.content.split("=").map(_.trim)
         parts.headOption match {
           case Some(label) if label == "sbt.version" =>
             parts.drop(1).headOption.map { version =>
-              Version(version) -> sourceFile.string.indexOf(version)
+              Version(version) -> sourceFile.content.indexOf(version)
             }
 
           case _ => None

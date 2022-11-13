@@ -25,7 +25,7 @@ object V {
         val assignments = DependencyParser.parseVersionDefs(parsed)
 
         val result = Replacement.replace(
-          parsed.string,
+          parsed.content,
           assignments.values.toList.map(v =>
             Replacement(v.location.start, v.location.end, "\"" + v.version.value + "-RC10" + "\"")
           )
@@ -61,7 +61,7 @@ libraryDependencies ++= Seq(
         val assignments = DependencyParser.getDependencies(Chunk.succeed(parsed)).toList
 
         val result = Replacement.replace(
-          parsed.string,
+          parsed.content,
           assignments.toList.map(v =>
             Replacement(v.location.start, v.location.end, "\"" + v.dependency.version.value + "-RC10" + "\"")
           )
@@ -90,7 +90,7 @@ libraryDependencies ++= Seq(
         val assignments = DependencyParser.getDependencies(Chunk.succeed(parsed)).toList
 
         val result = Replacement.replace(
-          parsed.string,
+          parsed.content,
           assignments.map(v => Replacement(v.location.start, v.location.end, s"${v.dependency.version.value}-RC10"))
         )
 
