@@ -11,7 +11,7 @@ object MillDependencyParserSpec extends ZIOSpecDefault {
       test("parse dependencies from trees") {
         val sourceFiles =
           Chunk(
-            SourceFile(
+            SourceFile.Sbt1DialectSourceFile(
               Path("fake"),
               """
 import mill._, scalalib._
@@ -32,8 +32,7 @@ object foo extends ScalaModule {
   )
 }
 
-""",
-              None
+"""
             )
           )
 
@@ -51,7 +50,7 @@ object foo extends ScalaModule {
       test("parse dependencies from multiple files") {
         val sourceFiles =
           Chunk(
-            SourceFile(
+            SourceFile.Sbt1DialectSourceFile(
               Path("fake"),
               """
 import mill._, scalalib._
@@ -66,10 +65,9 @@ object foo extends ScalaModule {
   )
 }
 
-""",
-              None
+"""
             ),
-            SourceFile(
+            SourceFile.Sbt1DialectSourceFile(
               Path("Versions.sc"),
               """
 import mill._, scalalib._
@@ -79,8 +77,7 @@ object V {
   val `zio-json` = "0.3.0"
   val zioTest = "1.0.14"
 }
-""",
-              Some("sc")
+"""
             )
           )
 

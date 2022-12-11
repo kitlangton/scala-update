@@ -9,7 +9,7 @@ object ReplacementSpec extends ZIOSpecDefault {
     suite("ReplacementSpec")(
       test("replace updated versions parsed from build definition with version definitions") {
         val parsed =
-          SourceFile(
+          SourceFile.Sbt1DialectSourceFile(
             Path("fake"),
             """
 object V {
@@ -18,8 +18,7 @@ object V {
   val `zio-spike` = "0.1.0"
   val `zio-json` = "0.1.0"
 }
-""",
-            None
+"""
           )
 
         val assignments = DependencyParser.parseVersionDefs(parsed)
@@ -45,7 +44,7 @@ object V {
       },
       test("replace updated versions parsed from build definition with inline versions") {
         val parsed =
-          SourceFile(
+          SourceFile.Sbt1DialectSourceFile(
             Path("build.sbt"),
             """
 libraryDependencies ++= Seq(
@@ -54,8 +53,7 @@ libraryDependencies ++= Seq(
   "dev.zio" %% "zio-spike" % "0.1.0",
   "dev.zio" %% "zio-json"  % "0.1.0"
 )
-""",
-            Some("sbt")
+"""
           )
 
         val assignments = DependencyParser.getDependencies(Chunk.succeed(parsed)).toList
@@ -81,10 +79,9 @@ libraryDependencies ++= Seq(
       },
       test("replace updated sbt version parsed from build.properties file") {
         val parsed =
-          SourceFile(
+          SourceFile.BuildPropertiesSourceFile(
             Path("project/build.properties"),
-            """sbt.version = 1.2.3""",
-            Some("properties")
+            """sbt.version = 1.2.3"""
           )
 
         val assignments = DependencyParser.getDependencies(Chunk.succeed(parsed)).toList

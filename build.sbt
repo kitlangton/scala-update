@@ -20,30 +20,32 @@ inThisBuild(
   )
 )
 
-val coursierVersion  = "2.1.0-RC3-1"
-val scalaMetaVersion = "4.7.0"
-val zioCliVersion    = "0.3.0-M02"
-val zioJsonVersion   = "0.4.2"
-val zioNioVersion    = "2.0.0"
-val zioTuiVersion    = "0.2.0"
-val zioVersion       = "2.0.5"
+val commonConfigurationVersion = "2.8.0"
+val coursierVersion            = "2.1.0-RC3-1"
+val scalaMetaVersion           = "4.7.0"
+val zioCliVersion              = "0.3.0-M02"
+val zioJsonVersion             = "0.4.2"
+val zioNioVersion              = "2.0.0"
+val zioTuiVersion              = "0.2.0"
+val zioVersion                 = "2.0.5"
 
 lazy val root = (project in file("."))
   .settings(
     name := "scala-update",
     libraryDependencies ++= Seq(
-      "dev.zio"              %% "zio"               % zioVersion,
-      "dev.zio"              %% "zio-cli"           % zioCliVersion,
-      "dev.zio"              %% "zio-macros"        % zioVersion,
-      "dev.zio"              %% "zio-nio"           % zioNioVersion,
-      "dev.zio"              %% "zio-json"          % zioJsonVersion,
-      "dev.zio"              %% "zio-streams"       % zioVersion,
-      "dev.zio"              %% "zio-test"          % zioVersion % Test,
-      "dev.zio"              %% "zio-test-magnolia" % zioVersion % Test,
-      "dev.zio"              %% "zio-test-sbt"      % zioVersion % Test,
-      "io.get-coursier"      %% "coursier"          % coursierVersion,
-      "org.scalameta"        %% "scalameta"         % scalaMetaVersion,
-      "io.github.kitlangton" %% "zio-tui"           % zioTuiVersion
+      "org.apache.commons"    % "commons-configuration2" % commonConfigurationVersion,
+      "dev.zio"              %% "zio"                    % zioVersion,
+      "dev.zio"              %% "zio-cli"                % zioCliVersion,
+      "dev.zio"              %% "zio-macros"             % zioVersion,
+      "dev.zio"              %% "zio-nio"                % zioNioVersion,
+      "dev.zio"              %% "zio-json"               % zioJsonVersion,
+      "dev.zio"              %% "zio-streams"            % zioVersion,
+      "dev.zio"              %% "zio-test"               % zioVersion % Test,
+      "dev.zio"              %% "zio-test-magnolia"      % zioVersion % Test,
+      "dev.zio"              %% "zio-test-sbt"           % zioVersion % Test,
+      "io.get-coursier"      %% "coursier"               % coursierVersion,
+      "org.scalameta"        %% "scalameta"              % scalaMetaVersion,
+      "io.github.kitlangton" %% "zio-tui"                % zioTuiVersion
     ),
     Compile / mainClass := Some("update.Main"),
     testFrameworks += new TestFramework("zio.test.sbt.ZTestFramework"),
