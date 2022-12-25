@@ -19,7 +19,7 @@ object Replacement {
           loop(tail, replacement.end)
         case Nil =>
           builder.append(original.substring(i))
-          builder.toString()
+          builder.toString
       }
 
     loop(replacements.sortBy(_.start).distinctBy(_.start), 0)

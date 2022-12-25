@@ -10,10 +10,9 @@ object SbtDependencyParserSpec extends ZIOSpecDefault {
       test("parse dependencies from file content") {
         val sourceFiles =
           Chunk(
-            SourceFile(
+            SourceFile.BuildPropertiesSourceFile(
               Path("project/build.properties"),
-              """sbt.version = 1.2.3""",
-              Some("properties")
+              """sbt.version = 1.2.3"""
             )
           )
 

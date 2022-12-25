@@ -9,6 +9,6 @@ trait Files {
 }
 
 object Files {
-  val live: ULayer[FilesLive] =
-    ZLayer.succeed(FilesLive())
+  val live: ULayer[FilesLive.type] =
+    ZLayer.succeed(FilesLive)
 }

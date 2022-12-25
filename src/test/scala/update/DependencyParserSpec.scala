@@ -11,7 +11,7 @@ object DependencyParserSpec extends ZIOSpecDefault {
       test("parse dependencies from trees") {
         val sourceFiles =
           Chunk(
-            SourceFile(
+            SourceFile.Sbt1DialectSourceFile(
               Path("fake"),
               """
 val V = {
@@ -25,10 +25,9 @@ libraryDependencies ++= Seq(
   "dev.zio" %%% "zio-test" % V.zioTest % Test,
   "dev.zio" % "zio-json" % V.`zio-json`
 )
-""",
-              None
+"""
             ),
-            SourceFile(
+            SourceFile.Sbt1DialectSourceFile(
               Path("fake"),
               """
 val V = {
@@ -39,8 +38,7 @@ libraryDependencies ++= Seq(
   "other.dev" % "other" % V.other,
   "other.dev" %%% "other.test" % "3.5.8" % Test
 )
-""",
-              None
+"""
             )
           )
 
