@@ -51,7 +51,8 @@ lazy val root = (project in file("."))
     testFrameworks += new TestFramework("zio.test.sbt.ZTestFramework"),
     graalVMNativeImageOptions ++= Seq(
       "--no-fallback",
-      "--enable-url-protocols=https"
+      "--enable-url-protocols=https",
+      "--report-unsupported-elements-at-runtime"
     ),
     scalacOptions ++= Seq(
       "-deprecation",
