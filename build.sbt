@@ -20,14 +20,14 @@ inThisBuild(
   )
 )
 
-val commonConfigurationVersion = "2.8.0"
-val coursierVersion            = "2.1.0-RC3-1"
-val scalaMetaVersion           = "4.7.0"
-val zioCliVersion              = "0.3.0-M02"
-val zioJsonVersion             = "0.4.2"
-val zioNioVersion              = "2.0.0"
+val commonConfigurationVersion = "2.9.0"
+val coursierVersion            = "2.1.0"
+val scalaMetaVersion           = "4.7.6"
+val zioCliVersion              = "0.4.0"
+val zioJsonVersion             = "0.5.0"
+val zioNioVersion              = "2.0.1"
 val zioTuiVersion              = "0.2.0"
-val zioVersion                 = "2.0.5"
+val zioVersion                 = "2.0.10"
 
 lazy val root = (project in file("."))
   .settings(
@@ -51,7 +51,8 @@ lazy val root = (project in file("."))
     testFrameworks += new TestFramework("zio.test.sbt.ZTestFramework"),
     graalVMNativeImageOptions ++= Seq(
       "--no-fallback",
-      "--enable-url-protocols=https"
+      "--enable-url-protocols=https",
+      "--report-unsupported-elements-at-runtime"
     ),
     scalacOptions ++= Seq(
       "-deprecation",
