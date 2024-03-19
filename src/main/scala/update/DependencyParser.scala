@@ -44,7 +44,7 @@ object SourceFile {
 object DependencyParser {
   def getDependencies(sources: Chunk[SourceFile]): Chunk[DependencyWithLocation] = {
     lazy val nonSbtVersionDefs = collectNonSbtVersionDefs(sources)
-    val builder     = ChunkBuilder.make[DependencyWithLocation]()
+    val builder                = ChunkBuilder.make[DependencyWithLocation]()
 
     sources.foreach {
       case source @ SbtVersionFile(version, start) =>
@@ -88,18 +88,16 @@ object DependencyParser {
   }
 
   private[update] def collectNonSbtVersionDefs(sourceFiles: Chunk[SourceFile]): Map[String, VersionWithLocation] =
-    sourceFiles
-      .collect { case f: SourceFile.Sbt1DialectSourceFile => parseVersionDefs(f) }
-      .flatten
-      .toMap
+    sourceFiles.collect { case f: SourceFile.Sbt1DialectSourceFile => parseVersionDefs(f) }.flatten.toMap
 
-  private[update] def parseVersionDefs(sourceFile: SourceFile.Sbt1DialectSourceFile): Map[String, VersionWithLocation] = {
+  private[update] def parseVersionDefs(
+    sourceFile: SourceFile.Sbt1DialectSourceFile
+  ): Map[String, VersionWithLocation] = {
     val mutableMap = mutable.Map.empty[String, VersionWithLocation]
-    sourceFile.tree.traverse {
-      case q"""val $identifier = ${term @ Lit.String(versionString)}""" =>
-        val location = Location(sourceFile.path, term.pos.start, term.pos.end)
-        val versionWithLocation = VersionWithLocation(Version(versionString), location)
-        mutableMap += (identifier.syntax -> versionWithLocation)
+    sourceFile.tree.traverse { case q"""val $identifier = ${term @ Lit.String(versionString)}""" =>
+      val location            = Location(sourceFile.path, term.pos.start, term.pos.end)
+      val versionWithLocation = VersionWithLocation(Version(versionString), location)
+      mutableMap += (identifier.syntax -> versionWithLocation)
     }
     mutableMap.toMap
   }
@@ -154,16 +152,18 @@ object DependencyParser {
         // identifier
         case Term.Name(identifier) => Some(identifier)
 
+        // { <identifier> }
+        case Term.Block(List(GetIdentifier(identifier))) => Some(identifier)
+
         case _ => None
       }
   }
 
   private object SbtVersionFile {
     def unapply(sourceFile: SourceFile.BuildPropertiesSourceFile): Option[(Version, Int)] =
-      Option(sourceFile.propertiesConfiguration.getProperty("sbt.version"))
-        .map { _version =>
-          val version = _version.asInstanceOf[String]
-          Version(version) -> sourceFile.content.indexOf(version)
-        }
+      Option(sourceFile.propertiesConfiguration.getProperty("sbt.version")).map { _version =>
+        val version = _version.asInstanceOf[String]
+        Version(version) -> sourceFile.content.indexOf(version)
+      }
   }
 }

@@ -22,7 +22,7 @@ inThisBuild(
 
 val commonConfigurationVersion = "2.9.0"
 val coursierVersion            = "2.1.9"
-val scalaMetaVersion           = "4.7.6"
+val scalaMetaVersion           = "4.9.2"
 val zioCliVersion              = "0.5.0"
 val zioJsonVersion             = "0.6.2"
 val zioNioVersion              = "2.0.2"
