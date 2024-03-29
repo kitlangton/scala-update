@@ -1,27 +1,24 @@
-package update
+package update.utils
 
 import zio.nio.file.{Files, Path}
 import zio.stream.ZStream
 
 import java.io.IOException
 
-object FileUtils {
+object FileUtils:
 
-  /**
-   * Returns a Stream of all Scala
-   */
+  /** Returns a Stream of all Scala
+    */
   def allScalaFiles(path: Path): ZStream[Any, IOException, Path] =
     allFilesWithExt(path, ".scala")
 
-  /**
-   * Returns a Stream of all mill build file (ammonite script)
-   */
+  /** Returns a Stream of all mill build file (ammonite script)
+    */
   def allMillFiles(path: Path): ZStream[Any, IOException, Path] =
     allFilesWithExt(path, ".sc")
 
-  /**
-   * Returns file extension of given path, if it exists
-   */
+  /** Returns file extension of given path, if it exists
+    */
   def extension(path: Path): Option[String] =
     path.filename.toString().split('.').lastOption
 
@@ -30,12 +27,11 @@ object FileUtils {
       Files
         .newDirectoryStream(path)
         .flatMap { path =>
-          for {
+          for
             isDir <- ZStream.fromZIO(Files.isDirectory(path))
-            res <- if (isDir) allScalaFiles(path)
+            res <- if isDir then allScalaFiles(path)
                    else ZStream.succeed(path)
-          } yield res
+          yield res
         }
         .filter(_.toString.endsWith(extension))
     }
-}

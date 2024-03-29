@@ -1,86 +1,71 @@
 on: push
 
 jobs:
-
   build-and-upload:
-    name: build and upload
+    name: Build and Upload
     strategy:
       matrix:
-        os: [macos, ubuntu]
+        os: [ubuntu-latest, macos-latest]
         include:
-          - os: ubuntu
-            runs: ubuntu-latest
+          - os: ubuntu-latest
             artifact-name: sup-linux-amd
-          - os: macos
-            runs: macos-latest
+          - os: macos-latest
             artifact-name: sup-macos-amd
-    runs-on: ${{ matrix.runs }}
+    runs-on: ${{ matrix.os }}
 
     steps:
-      - name: checkout
-        uses: actions/checkout@v2
-      - uses: coursier/cache-action@v6
+      - name: Checkout
+        uses: actions/checkout@v3
 
-      - name: test for ${{ matrix.os }}
-        run: |
-          ./sbt test
-
-      - uses: olafurpg/setup-scala@v13
-      - run: sbt ci-release
-        if: ${{ matrix.os == 'macos' }}
-        env:
-          PGP_PASSPHRASE: ${{ secrets.PGP_PASSPHRASE }}
-          PGP_SECRET: ${{ secrets.PGP_SECRET }}
-          SONATYPE_PASSWORD: ${{ secrets.SONATYPE_PASSWORD }}
-          SONATYPE_USERNAME: ${{ secrets.SONATYPE_USERNAME }}
-
-      - uses: graalvm/setup-graalvm@v1
-        if: ${{ startsWith(github.ref, 'refs/tags/') }}
+      - name: Setup Scala
+        uses: olafurpg/setup-scala@v14
         with:
-          version: 'latest'
-          java-version: '17'
-          components: 'native-image'
+          java-version: adopt@1.11
+
+      - name: Test for ${{ matrix.os }}
+        run: sbt test
+
+      - name: Setup GraalVM (for tagged commits)
+        uses: graalvm/setup-graalvm@v1
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          java-version: "21"
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: build for ${{ matrix.os }}
-        if: ${{ startsWith(github.ref, 'refs/tags/') }}
-        run: |
-          ./sbt graalvm-native-image:packageBin
+      - name: Build Native Image (for tagged commits)
+        run: sbt nativeImage
+        if: startsWith(github.ref, 'refs/tags/')
 
-      # disable on window: https://github.com/upx/upx/issues/559
-      - name: run upx on ${{ matrix.os }}
+      - name: Compress using UPX (not on Windows)
         uses: svenstaro/upx-action@v2
-        if: ${{ startsWith(github.ref, 'refs/tags/') }}
+        if: startsWith(github.ref, 'refs/tags/') && matrix.os != 'windows-latest'
         with:
-          file: target/graalvm-native-image/scala-update
+          file: target/native-image/scala-update
           args: --best --lzma
 
-      - name: upload ${{ matrix.os }}
-        uses: actions/upload-artifact@v2
-        if: ${{ startsWith(github.ref, 'refs/tags/') }}
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v3
+        if: startsWith(github.ref, 'refs/tags/')
         with:
           name: ${{ matrix.artifact-name }}
-          path: target/graalvm-native-image/scala-update
+          path: target/native-image/scala-update
 
-      - name: release binaries
+      - name: Release Binaries
         uses: svenstaro/upload-release-action@v2
-        if: ${{ startsWith(github.ref, 'refs/tags/') }}
+        if: startsWith(github.ref, 'refs/tags/')
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: target/graalvm-native-image/scala-update
+          file: target/native-image/scala-update
           asset_name: ${{ matrix.artifact-name }}
           overwrite: true
           tag: ${{ github.ref }}
 
-      - id: get_version
-        if: ${{ matrix.os == 'macos' && startsWith(github.ref, 'refs/tags/') }}
-        uses: battila7/get-version-action@v2
-
-      - name: bump homebrew formula
-        env:
-          HOMEBREW_GITHUB_API_TOKEN: ${{ secrets.HOMEBREW_GITHUB_TOKEN }}
-        if: ${{ matrix.os == 'macos' && startsWith(github.ref, 'refs/tags/') }}
+      - name: Prepare Homebrew Formula Update (macOS only)
+        if: startsWith(github.ref, 'refs/tags/') && matrix.os == 'macos-latest'
         run: |
           brew tap kitlangton/tap
-          brew bump-formula-pr kitlangton/tap/scala-update -f --no-browse --no-audit \
-          --url="https://github.com/kitlangton/scala-update/releases/download/${{ steps.get_version.outputs.version }}/${{ matrix.artifact-name }}"
+          version=$(echo "${{ github.ref }}" | sed 's/refs\/tags\///')
+          brew bump-formula-pr kitlangton/tap/scala-update --no-browse --no-audit \
+          --url="https://github.com/kitlangton/scala-update/releases/download/${version}/${{ matrix.artifact-name }}"
+        env:
+          HOMEBREW_GITHUB_API_TOKEN: ${{ secrets.HOMEBREW_GITHUB_API_TOKEN }}

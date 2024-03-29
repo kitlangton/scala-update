@@ -1,8 +1,11 @@
-
 .bsp
 .idea
-.bloop
-.metals
-.vscode
+project/project/target/config-classes
+project/target
 target
+.vscode
+.metals
+.bloop
+project/project
+project/metals.sbt
 .DS_Store
